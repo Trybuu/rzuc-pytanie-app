@@ -1,12 +1,53 @@
-import { Stack } from 'expo-router'
+import { useFonts } from 'expo-font'
+import { SplashScreen, Stack } from 'expo-router'
+import { useEffect } from 'react'
+
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    MuseoModerno: require('../assets/fonts/MuseoModerno-Regular.ttf'),
+  })
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync()
+    }
+  }, [loaded, error])
+
+  if (!loaded && !error) {
+    return null
+  }
+
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        headerLargeTitleShadowVisible: false,
+        headerTintColor: '#fff',
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          fontFamily: 'MuseoModerno',
+          fontSize: 16,
+        },
+        headerStyle: {
+          backgroundColor: '#2B2F41',
+        },
+        headerBackTitleStyle: {
+          fontFamily: 'MuseoModerno',
+          fontSize: 16,
+        },
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false, title: 'Start' }}
+      />
       <Stack.Screen
         name="menu"
-        options={{ headerShown: true, title: 'Menu' }}
+        options={{
+          headerShown: true,
+          title: 'Menu',
+        }}
       />
       <Stack.Screen
         name="newGame"
