@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native'
 export default function JoinGame() {
   return (
     <View style={styles.viewWrapper}>
-      <MyText>Join Game Screen</MyText>
+      <MyText align="center">Pokaż się światu!</MyText>
     </View>
   )
 }
