@@ -24,12 +24,6 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     textAlign: 'center',
     borderRadius: 24,
-    // iOS shadow
-    shadowColor: '#000',
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 1,
-    // Android shadow
-    elevation: 5,
+    boxShadow: '0px 4px 1px #2e65be',
   },
 })

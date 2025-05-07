@@ -1,33 +1,98 @@
+import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
+import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
-import { Image, Pressable, StyleSheet, TextInput, View } from 'react-native'
+import {
+  Alert,
+  Image,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native'
 
 export default function NewGame() {
-  const [playerName, setPlayerName] = useState('Twoje imię')
+  const [playerName, setPlayerName] = useState('')
+  const [image, setImage] = useState<string | null>(null)
+
+  const pickImage = async () => {
+    Alert.alert(
+      'Dodaj zdjęcie',
+      'Wybierz źródło zdjęcia',
+      [
+        {
+          text: 'Zrób zdjęcie',
+          onPress: takePhoto,
+        },
+        {
+          text: 'Wybierz z galerii',
+          onPress: pickFromGallery,
+        },
+        {
+          text: 'Anuluj',
+          style: 'cancel',
+        },
+      ],
+      {
+        cancelable: true,
+      },
+    )
+  }
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync()
+    if (!permission.granted) {
+      console.log('Brak uprawnień do użycia aparatu')
+      return
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri)
+    }
+  }
+
+  const pickFromGallery = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+
+    console.log(result)
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri)
+    }
+  }
 
   return (
     <View style={styles.viewWrapper}>
       <View style={styles.viewContent}>
         <View style={styles.createPlayerView}>
           <MyText align="center">Kim jesteś? Pokaż się światu!</MyText>
-          <Image
-            style={{
-              height: 192,
-              width: 192,
-              backgroundColor: 'orange',
-              borderRadius: '50%',
-              marginVertical: 24,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {/* <MaterialIcons name="add-photo-alternate" size={64} color="#fff" /> */}
-          </Image>
+          <Pressable onPress={pickImage}>
+            <Image
+              source={
+                image
+                  ? { uri: image }
+                  : require('@/assets/images/add-image.png')
+              }
+              style={styles.image}
+            />
+          </Pressable>
           <MyText align="center">
             {playerName.trim() === '' ? 'Twoje imię' : playerName}
           </MyText>
           <TextInput
             value={playerName}
+            placeholder="Twoje imię"
             onChange={(e) => setPlayerName(e.nativeEvent.text)}
             style={{
               marginVertical: 24,
@@ -35,19 +100,18 @@ export default function NewGame() {
               paddingVertical: 12,
               width: '100%',
               color: '#A7A7A7',
-              backgroundColor: '#282a3a',
+              backgroundColor: '#2b2d3f',
               borderRadius: 24,
-              shadowColor: '#000',
-              shadowOffset: { width: 1, height: -3 },
-              shadowOpacity: 0.25,
+
+              boxShadow: '0px 4px 1px #282a3a',
             }}
           ></TextInput>
         </View>
 
         <View>
-          <Pressable style={styles.button}>
+          <MyButton>
             <MyText align="center">Zaczynamy!</MyText>
-          </Pressable>
+          </MyButton>
         </View>
       </View>
     </View>
@@ -84,5 +148,12 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     // Android shadow
     elevation: 5,
+  },
+
+  image: {
+    height: 192,
+    width: 192,
+    borderRadius: 100,
+    marginVertical: 24,
   },
 })
