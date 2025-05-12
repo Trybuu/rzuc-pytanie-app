@@ -1,7 +1,10 @@
+import { socketCreateLobby } from '@/client/events'
+import socket from '@/client/socket'
 import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
 import * as ImagePicker from 'expo-image-picker'
-import { useState } from 'react'
+import { useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   Image,
@@ -14,6 +17,17 @@ import {
 export default function NewGame() {
   const [playerName, setPlayerName] = useState('')
   const [image, setImage] = useState<string | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to socket server')
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   const pickImage = async () => {
     Alert.alert(
@@ -37,6 +51,28 @@ export default function NewGame() {
         cancelable: true,
       },
     )
+  }
+
+  const handleCreateLobby = async () => {
+    if (playerName.trim().length < 3 || image === null) {
+      Alert.alert('Uzupełnij wszystkie pola')
+      return
+    }
+
+    const lobbyCode = await socketCreateLobby(playerName, image)
+
+    if (!lobbyCode) {
+      Alert.alert('Nie udało się stworzyć lobby')
+      return
+    }
+    console.log(lobbyCode)
+
+    router.push({
+      pathname: '/lobby',
+      params: {
+        lobbyCode,
+      },
+    })
   }
 
   const takePhoto = async () => {
@@ -93,23 +129,14 @@ export default function NewGame() {
           <TextInput
             value={playerName}
             placeholder="Twoje imię"
+            placeholderTextColor={'#fff'}
             onChange={(e) => setPlayerName(e.nativeEvent.text)}
-            style={{
-              marginVertical: 24,
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              width: '100%',
-              color: '#A7A7A7',
-              backgroundColor: '#2b2d3f',
-              borderRadius: 24,
-
-              boxShadow: '0px 4px 1px #282a3a',
-            }}
+            style={styles.input}
           ></TextInput>
         </View>
 
         <View>
-          <MyButton>
+          <MyButton onPress={handleCreateLobby}>
             <MyText align="center">Zaczynamy!</MyText>
           </MyButton>
         </View>
@@ -134,26 +161,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  button: {
-    marginVertical: 12,
-    backgroundColor: '#3B82F6',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    textAlign: 'center',
-    borderRadius: 24,
-    // iOS shadow
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 1,
-    // Android shadow
-    elevation: 5,
-  },
-
   image: {
     height: 192,
     width: 192,
     borderRadius: 100,
     marginVertical: 24,
+  },
+
+  input: {
+    marginVertical: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    width: '100%',
+    color: '#fff',
+    fontFamily: 'MuseoModerno',
+    backgroundColor: '#232638',
+    borderRadius: 24,
+
+    boxShadow: '-2px -2px 1px rgba(0,0,0,0.5)',
   },
 })

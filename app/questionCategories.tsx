@@ -10,6 +10,7 @@ type CategoryType = {
   createdAt: string
 }
 
+// 1. Dodać możliwość ponownej próby jeśli wystąpił błąd
 export default function QuestionCategories() {
   const {
     data: categories,

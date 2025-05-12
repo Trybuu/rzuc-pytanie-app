@@ -69,6 +69,16 @@ export default function RootLayout() {
           name="questionCategories"
           options={{ headerShown: true, title: 'Kategorie pytań' }}
         />
+        <Stack.Screen
+          name="lobby"
+          options={{
+            headerShown: true,
+            headerBackButtonMenuEnabled: false,
+            headerLeft: () => null,
+            gestureEnabled: false,
+            title: 'Gra utworzona',
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   )
