@@ -72,11 +72,9 @@ export default function RootLayout() {
         <Stack.Screen
           name="lobby"
           options={{
-            headerShown: true,
-            headerBackButtonMenuEnabled: false,
-            headerLeft: () => null,
-            gestureEnabled: false,
+            headerShown: false,
             title: 'Gra utworzona',
+            gestureEnabled: false,
           }}
         />
       </Stack>

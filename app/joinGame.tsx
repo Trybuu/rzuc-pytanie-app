@@ -1,9 +1,12 @@
 import MyButton from '@/components/Button'
+import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
 import { useRef, useState } from 'react'
-import { Keyboard, StyleSheet, TextInput, View } from 'react-native'
+import { Keyboard, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 
 export default function JoinGame() {
+  const [playerName, setPlayerName] = useState('')
+  const [image, setImage] = useState<string>('')
   const [accessCode, setAccessCode] = useState(['', '', '', ''])
   const inputRefs = [
     useRef<TextInput>(null),
@@ -11,6 +14,7 @@ export default function JoinGame() {
     useRef<TextInput>(null),
     useRef<TextInput>(null),
   ]
+
   const handleChange = (text: string, index: number) => {
     if (text.charCodeAt(0) < 48 || text.charCodeAt(0) > 57) {
       return
@@ -39,7 +43,7 @@ export default function JoinGame() {
   }
 
   return (
-    <View style={styles.viewWrapper}>
+    <ScrollView style={styles.viewWrapper}>
       <View style={styles.viewContent}>
         <MyText align="center">
           Wpisz kod dostępu, aby dołączyć do znajomych!
@@ -61,12 +65,19 @@ export default function JoinGame() {
             )
           })}
         </View>
+
+        <CreatePlayer
+          playerName={playerName}
+          image={image}
+          setPlayerName={setPlayerName}
+          setImage={setImage}
+        />
       </View>
 
       <MyButton>
         <MyText align="center">Dołącz</MyText>
       </MyButton>
-    </View>
+    </ScrollView>
   )
 }
 

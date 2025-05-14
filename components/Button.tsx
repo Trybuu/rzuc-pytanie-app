@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     textAlign: 'center',
     borderRadius: 24,
-    boxShadow: '0px 4px 1px #2e65be',
+    // boxShadow: '0px 4px 1px #2e65be',
   },
 })
 
