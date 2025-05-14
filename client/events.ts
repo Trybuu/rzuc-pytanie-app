@@ -23,30 +23,24 @@ const socketCreateLobby = async (
   })
 }
 
-// const socketJoinLobby = async (
-//   lobbyCode: string,
-//   playerName: string,
-//   avatar: string,
-// ) => {
-//   return new Promise((resolve) => {
-//     socket.emit(
-//       'joinLobby',
-//       { lobbyCode, playerName, avatar },
-//       (response: {
-//         success: boolean
-//         message?: string
-//         player: { id: string; playerName: string; avatar: string }
-//       }) => {
-//         if (response.success) {
-//           console.log(response.player)
-//           resolve(response.player)
-//         } else {
-//           console.log('Błąd: ', response.message)
-//           resolve(`Błąd: ${response.message}`)
-//         }
-//       },
-//     )
-//   })
-// }
+const socketJoinLobby = async (
+  lobbyCode: string,
+  playerName: string,
+  avatar: string,
+): Promise<Lobby> => {
+  return new Promise((resolve, reject) => {
+    socket.emit(
+      'joinLobby',
+      { lobbyCode, playerName, avatar },
+      (response: { success: boolean; message?: string; lobby: Lobby }) => {
+        if (response.success) {
+          resolve(response.lobby)
+        } else {
+          reject(`Błąd: ${response.message}`)
+        }
+      },
+    )
+  })
+}
 
-export { socketCreateLobby }
+export { socketCreateLobby, socketJoinLobby }
