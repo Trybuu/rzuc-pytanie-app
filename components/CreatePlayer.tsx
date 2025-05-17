@@ -73,6 +73,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     })
 
     if (!result.canceled) {
@@ -86,6 +87,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     })
 
     console.log(result)

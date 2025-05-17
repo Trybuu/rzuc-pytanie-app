@@ -1,7 +1,13 @@
 // const apiUrl = 'http://localhost:3000/api/v1'
 const apiUrl = 'http://192.168.1.11:3000/api/v1'
 
-export const getCategories = async () => {
+export type Category = {
+  id: number
+  name: string
+  created_at: string
+}
+
+export const getCategories = async (): Promise<Category[]> => {
   try {
     const response = await fetch(`${apiUrl}/category`)
 
