@@ -43,4 +43,24 @@ const socketJoinLobby = async (
   })
 }
 
-export { socketCreateLobby, socketJoinLobby }
+const socketEditLobby = (
+  accessCode: string,
+  action: 'changeRoundsNumber' | 'changeCategories',
+  newValue: any,
+) => {
+  socket.emit(
+    'lobbyEdit',
+    {
+      lobbyCode: accessCode,
+      action: action,
+      newValue: newValue,
+    },
+    (response: { success: boolean; message?: string; lobby?: Lobby }) => {
+      if (!response.success) {
+        console.error(`Błąd: ${response.message}`)
+      }
+    },
+  )
+}
+
+export { socketCreateLobby, socketEditLobby, socketJoinLobby }

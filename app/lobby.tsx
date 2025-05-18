@@ -1,4 +1,5 @@
 import { Category, getCategories } from '@/api/category'
+import { socketEditLobby } from '@/client/events'
 import socket from '@/client/socket'
 import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
@@ -11,19 +12,25 @@ export default function Lobby() {
   const navigation = useNavigation()
 
   // Wykorzystanie danych z lobbyStore
-  const { accessCode, players, hostId } = useLobbyStore((state) => state)
-  const { createLobby, setPlayers } = useLobbyStore()
+  const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
+    (state) => state,
+  )
+  const {
+    createLobby,
+    setPlayers,
+    toggleCategory,
+    setCategoryList,
+    setRounds,
+  } = useLobbyStore()
 
   // Czy gracz jest hostem rozgrywki
   const playerSocketId = socket.id
   const isHost = playerSocketId === hostId
 
-  // Wczytanie danych z API
-  const [categories, setCategories] = useState<Category[] | null>(null)
-
-  // Ustawienie zasad rozgrywki
-  const [rounds, setRounds] = useState<string>('1')
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+  // Zapisywanie danych z API
+  const [availableCategories, setAvailableCategories] = useState<
+    Category[] | null
+  >(null)
 
   useEffect(() => {
     const listener = navigation.addListener('beforeRemove', (e) => {
@@ -42,8 +49,12 @@ export default function Lobby() {
       createLobby(lobbyData)
     }
 
-    const handleLobbyUpdated = (lobbyData: LobbyType) => {
+    const handleLobbyUpdated = (
+      lobbyData: LobbyType & { rounds: number; categories: number[] },
+    ) => {
       setPlayers(lobbyData.players)
+      setRounds(lobbyData.rounds)
+      setCategoryList(lobbyData.categories)
     }
 
     socket.on('lobbyCreated', handleLobbyCreated)
@@ -53,14 +64,14 @@ export default function Lobby() {
       socket.off('lobbyCreated', handleLobbyCreated)
       socket.off('lobbyUpdated', handleLobbyUpdated)
     }
-  }, [createLobby, setPlayers])
+  }, [setPlayers, setRounds, setCategoryList])
 
   // Zapytania do API
   useEffect(() => {
     const fetchCategories = async () => {
       const categories = await getCategories()
 
-      setCategories(categories)
+      setAvailableCategories(categories)
       console.log(categories)
     }
 
@@ -68,45 +79,31 @@ export default function Lobby() {
   }, [])
 
   // Aktualizuj wartość ilości rund w rozgrywce
-  const handleSetRounds = (action: 'add' | 'subtract'): void => {
+  const handleSetRounds = (action: 'add' | 'subtract') => {
     if (!isHost) return
 
-    const roundsNumber: number = parseInt(rounds)
+    let roundsNumber: number = rounds
 
-    if (action === 'add') {
-      if (roundsNumber < 6) {
-        const newRoundsNumber = roundsNumber + 1
-        setRounds(newRoundsNumber.toString())
-      }
+    if (action === 'add' && roundsNumber < 6) {
+      roundsNumber = roundsNumber + 1
     }
 
-    if (action === 'subtract') {
-      if (roundsNumber > 1) {
-        const newRoundsNumber = roundsNumber - 1
-        setRounds(newRoundsNumber.toString())
-      }
+    if (action === 'subtract' && roundsNumber > 1) {
+      roundsNumber = roundsNumber - 1
     }
+
+    socketEditLobby(accessCode, 'changeRoundsNumber', roundsNumber)
   }
 
   // Aktualizuj wybrane kategorie pytań
   const handleSelectCategory = (id: number) => {
     if (!isHost) return
-
-    const newCategories = [...selectedCategories]
-
-    if (selectedCategories.includes(id)) {
-      newCategories.splice(selectedCategories.indexOf(id), 1)
-    } else {
-      newCategories.push(id)
-    }
-
-    setSelectedCategories(newCategories)
+    toggleCategory(accessCode, id)
   }
 
   if (players)
     return (
       <ScrollView style={styles.viewWrapper}>
-        <MyText>{playerSocketId === hostId ? 'admin' : 'gracz'}</MyText>
         <View style={styles.accessInfoWrapper}>
           <MyText>Kod dostępu do gry</MyText>
           <MyText>{accessCode}</MyText>
@@ -148,7 +145,7 @@ export default function Lobby() {
               <MyText align="center">-</MyText>
             </Pressable>
 
-            <MyText align="center">{rounds}</MyText>
+            <MyText align="center">{rounds.toString()}</MyText>
 
             <Pressable
               onPress={() => handleSetRounds('add')}
@@ -165,17 +162,18 @@ export default function Lobby() {
         </View>
 
         <View>
-          <MyText>Wybrane kategorie: {selectedCategories.length}</MyText>
+          <MyText>Wybrane kategorie: {categories.length}</MyText>
           <ScrollView style={styles.categoriesWrapper}>
-            {categories ? (
-              categories.map((category) => (
+            {availableCategories ? (
+              availableCategories.map((category) => (
                 <Pressable
                   key={category.id}
                   style={[
                     styles.categoryElement,
-                    selectedCategories.includes(category.id) && {
-                      borderWidth: 2,
-                      borderColor: 'orange',
+                    categories.includes(category.id) && {
+                      backgroundColor: 'rgba(255, 157, 0,0.5)',
+                      borderRadius: 12,
+                      padding: 6,
                     },
                   ]}
                   onPress={(e) => handleSelectCategory(category.id)}
