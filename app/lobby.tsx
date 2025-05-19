@@ -16,13 +16,8 @@ export default function Lobby() {
   const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
     (state) => state,
   )
-  const {
-    createLobby,
-    setPlayers,
-    toggleCategory,
-    setCategoryList,
-    setRounds,
-  } = useLobbyStore()
+  const { setLobby, setPlayers, toggleCategory, setCategoryList, setRounds } =
+    useLobbyStore()
 
   // Czy gracz jest hostem rozgrywki
   const playerSocketId = socket.id
@@ -47,7 +42,7 @@ export default function Lobby() {
   // Nasłuchiwanie socketów
   useEffect(() => {
     const handleLobbyCreated = (lobbyData: LobbyType) => {
-      createLobby(lobbyData)
+      setLobby(lobbyData)
     }
 
     const handleLobbyUpdated = (

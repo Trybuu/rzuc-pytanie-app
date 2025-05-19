@@ -1,17 +1,14 @@
-import { socketCreateLobby } from '@/client/events'
 import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
-import { useLobbyStore } from '@/store/lobbyStore'
-import { useRouter } from 'expo-router'
+import { useCreateLobby } from '@/hooks/useCreateLobby'
 import { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
 
 export default function NewGame() {
+  const { create } = useCreateLobby()
   const [playerName, setPlayerName] = useState('')
   const [image, setImage] = useState<string>('')
-  const router = useRouter()
-  const { createLobby } = useLobbyStore()
 
   const handleCreateLobby = async () => {
     try {
@@ -20,16 +17,10 @@ export default function NewGame() {
         return
       }
 
-      const lobby = await socketCreateLobby(playerName, image)
-      console.log(lobby)
+      const result = await create(playerName, image)
 
-      if (lobby) {
-        createLobby(lobby)
-
-        router.push({
-          pathname: '/lobby',
-          params: { accessCode: lobby.accessCode },
-        })
+      if (!result.success) {
+        Alert.alert(`Błąd: ${result.message}`)
       }
     } catch (err) {
       console.error('Błąd w trakcie tworzenia lobby, client: ', err)

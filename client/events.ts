@@ -1,7 +1,7 @@
 import { Lobby } from '@/store/lobbyStore'
 import socket from './socket'
 
-const socketCreateLobby = async (
+const emitCreateLobby = async (
   playerName: string,
   avatar: string,
 ): Promise<Lobby> => {
@@ -12,18 +12,18 @@ const socketCreateLobby = async (
         playerName: playerName,
         avatar: avatar,
       },
-      (response: { success: boolean; lobby: Lobby }) => {
+      (response: { success: boolean; message: string; lobby: Lobby }) => {
         if (response.success) {
           resolve(response.lobby)
         } else {
-          reject(new Error('Nie udało się utworzyć lobby'))
+          reject(response.message)
         }
       },
     )
   })
 }
 
-const socketJoinLobby = async (
+const emitJoinLobby = async (
   lobbyCode: string,
   playerName: string,
   avatar: string,
@@ -36,7 +36,7 @@ const socketJoinLobby = async (
         if (response.success) {
           resolve(response.lobby)
         } else {
-          reject(`Błąd: ${response.message}`)
+          reject(response.message)
         }
       },
     )
@@ -63,4 +63,4 @@ const socketEditLobby = (
   )
 }
 
-export { socketCreateLobby, socketEditLobby, socketJoinLobby }
+export { emitCreateLobby, emitJoinLobby, socketEditLobby }

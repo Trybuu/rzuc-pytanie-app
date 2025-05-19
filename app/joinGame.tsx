@@ -1,13 +1,19 @@
-import { socketJoinLobby } from '@/client/events'
 import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
-import { useLobbyStore } from '@/store/lobbyStore'
-import { router } from 'expo-router'
+import { useJoinLobby } from '@/hooks/useJoinLobby'
 import { useRef, useState } from 'react'
-import { Keyboard, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import {
+  Alert,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native'
 
 export default function JoinGame() {
+  const { join } = useJoinLobby()
   const [playerName, setPlayerName] = useState('')
   const [image, setImage] = useState<string>('')
   const [accessCode, setAccessCode] = useState(['', '', '', ''])
@@ -17,7 +23,6 @@ export default function JoinGame() {
     useRef<TextInput>(null),
     useRef<TextInput>(null),
   ]
-  const { createLobby } = useLobbyStore()
 
   const handleChange = (text: string, index: number) => {
     if (text.charCodeAt(0) < 48 || text.charCodeAt(0) > 57) {
@@ -47,13 +52,14 @@ export default function JoinGame() {
   }
 
   const handleJoinLobby = async () => {
-    const lobby = await socketJoinLobby(accessCode.join(''), playerName, image)
+    try {
+      const result = await join(accessCode.join(''), playerName, image)
 
-    if (lobby) {
-      createLobby(lobby)
-      router.push({
-        pathname: '/lobby',
-      })
+      if (!result?.success) {
+        Alert.alert(`Błąd: ${result?.message}`)
+      }
+    } catch (err) {
+      console.error('Błąd w trakcie dołączania do lobby: ', err)
     }
   }
 
