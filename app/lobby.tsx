@@ -1,6 +1,7 @@
 import { Category, getCategories } from '@/api/category'
 import { socketEditLobby } from '@/client/events'
 import socket from '@/client/socket'
+import AccessCodeView from '@/components/AccessCodeView'
 import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
@@ -106,7 +107,8 @@ export default function Lobby() {
       <ScrollView style={styles.viewWrapper}>
         <View style={styles.accessInfoWrapper}>
           <MyText>Kod dostępu do gry</MyText>
-          <MyText>{accessCode}</MyText>
+          {/* <MyText>{accessCode}</MyText> */}
+          <AccessCodeView />
         </View>
 
         <View
