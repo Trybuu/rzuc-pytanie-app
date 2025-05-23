@@ -3,9 +3,10 @@ import { socketEditLobby } from '@/client/events'
 import socket from '@/client/socket'
 import AccessCodeView from '@/components/AccessCodeView'
 import MyButton from '@/components/Button'
+import ExitGameButton from '@/components/ExitGameButton'
 import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
-import { useNavigation } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
@@ -16,8 +17,14 @@ export default function Lobby() {
   const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
     (state) => state,
   )
-  const { setLobby, setPlayers, toggleCategory, setCategoryList, setRounds } =
-    useLobbyStore()
+  const {
+    setLobby,
+    resetLobby,
+    setPlayers,
+    toggleCategory,
+    setCategoryList,
+    setRounds,
+  } = useLobbyStore()
 
   // Czy gracz jest hostem rozgrywki
   const playerSocketId = socket.id
@@ -97,13 +104,24 @@ export default function Lobby() {
     toggleCategory(accessCode, id)
   }
 
+  // Opuść grę
+  const handleExitGame = () => {
+    console.log('Socket Disconnect')
+    socket.disconnect()
+    resetLobby()
+    router.replace({
+      pathname: '/joinGame',
+    })
+    socket.connect()
+  }
+
   if (players)
     return (
       <ScrollView style={styles.viewWrapper}>
         <View style={styles.accessInfoWrapper}>
           <MyText>Kod dostępu do gry</MyText>
           {/* <MyText>{accessCode}</MyText> */}
-          <AccessCodeView />
+          <AccessCodeView accessCode={accessCode} />
         </View>
 
         <View
@@ -158,34 +176,32 @@ export default function Lobby() {
           </View>
         </View>
 
-        <View>
-          <MyText>Wybrane kategorie: {categories.length}</MyText>
-          <ScrollView style={styles.categoriesWrapper}>
-            {availableCategories ? (
-              availableCategories.map((category) => (
-                <Pressable
-                  key={category.id}
-                  style={[
-                    styles.categoryElement,
-                    categories.includes(category.id) && {
-                      backgroundColor: 'rgba(255, 157, 0,0.5)',
-                      borderRadius: 12,
-                      padding: 6,
-                    },
-                  ]}
-                  onPress={(e) => handleSelectCategory(category.id)}
-                >
-                  <MyText>{category.name}</MyText>
-                </Pressable>
-              ))
-            ) : (
-              <MyText>Wczytywanie kategorii</MyText>
-            )}
-          </ScrollView>
-        </View>
+        <MyText>Wybrane kategorie: {categories.length}</MyText>
+        <ScrollView style={styles.categoriesWrapper}>
+          {availableCategories ? (
+            availableCategories.map((category) => (
+              <Pressable
+                key={category.id}
+                style={[
+                  styles.categoryElement,
+                  categories.includes(category.id) && {
+                    backgroundColor: 'rgba(255, 157, 0,0.5)',
+                    borderRadius: 12,
+                    padding: 6,
+                  },
+                ]}
+                onPress={(e) => handleSelectCategory(category.id)}
+              >
+                <MyText>{category.name}</MyText>
+              </Pressable>
+            ))
+          ) : (
+            <MyText>Wczytywanie kategorii</MyText>
+          )}
+        </ScrollView>
 
+        <MyText>Wszyscy gracze: {players.length}</MyText>
         <ScrollView style={styles.playersWrapper}>
-          <MyText>Wszyscy gracze: {players.length}</MyText>
           {players?.map((player) => (
             <View key={player.id} style={styles.playerElement}>
               <Image
@@ -209,6 +225,8 @@ export default function Lobby() {
         ) : (
           <MyText align="center">Czekaj na rozpoczęcie gry</MyText>
         )}
+
+        <ExitGameButton onPress={() => handleExitGame()} />
       </ScrollView>
     )
 }
@@ -217,7 +235,8 @@ const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
     backgroundColor: '#2B2F41',
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 48,
   },
 
   viewContent: {

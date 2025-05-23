@@ -22,6 +22,7 @@ type LobbyState = {
   rounds: number
   categories: number[]
   setLobby: (lobby: Lobby) => void
+  resetLobby: () => void
   setPlayers: (players: Player[]) => void
   addPlayer: (player: Player) => void
   removePlayer: (id: string) => void
@@ -37,6 +38,14 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   rounds: 1,
   categories: [],
   setLobby: (lobby) => set(() => ({ ...lobby })),
+  resetLobby: () =>
+    set(() => ({
+      hostId: '',
+      players: [],
+      accessCode: '',
+      rounds: 1,
+      categories: [],
+    })),
   setPlayers: (players) => set({ players }),
   addPlayer: (player) =>
     set((state) => ({ players: [...state.players, player] })),

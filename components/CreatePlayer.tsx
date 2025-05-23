@@ -93,13 +93,14 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     console.log(result)
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri)
+      const base64 = result.assets[0].base64
+      setImage(`data:image/jpeg;base64,${base64}`)
     }
   }
 
   return (
     <View style={styles.createPlayerView}>
-      <MyText align="center">Kim jesteś? Pokaż się światu!</MyText>
+      <MyText align="center">Kim jesteś? Zaskocz znajomych!</MyText>
       <Pressable onPress={pickImage}>
         <Image
           source={

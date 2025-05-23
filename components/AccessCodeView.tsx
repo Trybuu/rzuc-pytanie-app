@@ -1,21 +1,20 @@
 import { StyleSheet, View } from 'react-native'
 import MyText from './MyText'
 
-const AccessCodeView = () => {
+type AccessCodeViewProps = {
+  accessCode: string
+}
+
+const AccessCodeView: React.FC<AccessCodeViewProps> = ({ accessCode }) => {
+  const accessCodeArray = accessCode.split('')
+
   return (
     <View style={styles.accessCodeWrapper}>
-      <View style={styles.accessCodeTile}>
-        <MyText align="center">5</MyText>
-      </View>
-      <View style={styles.accessCodeTile}>
-        <MyText align="center">3</MyText>
-      </View>
-      <View style={styles.accessCodeTile}>
-        <MyText align="center">7</MyText>
-      </View>
-      <View style={styles.accessCodeTile}>
-        <MyText align="center">1</MyText>
-      </View>
+      {accessCodeArray.map((digitTxt, index) => (
+        <View style={styles.accessCodeTile} key={index}>
+          <MyText align="center">{digitTxt}</MyText>
+        </View>
+      ))}
     </View>
   )
 }
@@ -28,8 +27,12 @@ const styles = StyleSheet.create({
   },
 
   accessCodeTile: {
-    height: 42,
-    width: 42,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 36,
+    width: 36,
+    marginLeft: 6,
+    boxShadow: 'inset 2px 2px 2px rgba(0, 0, 0, 0.5)',
+    borderRadius: 6,
   },
 })
