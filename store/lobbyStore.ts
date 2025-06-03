@@ -1,10 +1,28 @@
 import { socketEditLobby } from '@/client/events'
 import { create } from 'zustand'
 
+export type Question = {
+  id: string
+  question: string
+  isCustomQuestion: boolean
+  answers: string[]
+  points: number
+}
+
 export type Player = {
   id: string
   playerName: string
   avatar: string
+  questionsTargetPlayerId?: string
+  isReady: boolean
+  questions: Question[]
+}
+
+export type Category = {
+  id: number
+  name: string
+  is_custom: boolean
+  created_at: string
 }
 
 export type Lobby = {
@@ -13,6 +31,12 @@ export type Lobby = {
   accessCode: string
   rounds: number
   categories: number[]
+  currentRound?: number
+  roundsTotal?: number
+  playerTurnIndex: number
+  currentCategoryIndex: number
+  hasCustomCategory?: boolean
+  allCategories?: Category[]
 }
 
 type LobbyState = {
@@ -21,9 +45,16 @@ type LobbyState = {
   accessCode: string
   rounds: number
   categories: number[]
+  currentRound?: number
+  roundsTotal?: number
+  playerTurnIndex: number
+  currentCategoryIndex: number
+  hasCustomCategory?: boolean
+  allCategories?: Category[]
   setLobby: (lobby: Lobby) => void
   resetLobby: () => void
   setPlayers: (players: Player[]) => void
+  setPlayer: (id: string, player: Player) => void
   addPlayer: (player: Player) => void
   removePlayer: (id: string) => void
   setRounds: (newRoundsNumber: number) => void
@@ -37,6 +68,8 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   accessCode: '',
   rounds: 1,
   categories: [],
+  playerTurnIndex: 0,
+  currentCategoryIndex: 0,
   setLobby: (lobby) => set(() => ({ ...lobby })),
   resetLobby: () =>
     set(() => ({
@@ -47,6 +80,10 @@ export const useLobbyStore = create<LobbyState>((set) => ({
       categories: [],
     })),
   setPlayers: (players) => set({ players }),
+  setPlayer: (id, player) =>
+    set((state) => ({
+      players: state.players.map((p) => (p.id === id ? player : p)),
+    })),
   addPlayer: (player) =>
     set((state) => ({ players: [...state.players, player] })),
   removePlayer: (id) =>

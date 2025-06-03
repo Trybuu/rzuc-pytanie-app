@@ -2,11 +2,29 @@ import { Pressable, PressableProps, StyleSheet } from 'react-native'
 
 type MyButtonProps = PressableProps & {
   children: React.ReactNode
+  bgColor?: 'blue' | 'red' | 'green'
 }
 
-const MyButton: React.FC<MyButtonProps> = ({ children, ...props }) => {
+const MyButton: React.FC<MyButtonProps> = ({
+  bgColor = 'blue',
+  children,
+  ...props
+}) => {
   return (
-    <Pressable style={styles.button} {...props}>
+    <Pressable
+      style={[
+        styles.button,
+        {
+          backgroundColor:
+            bgColor === 'blue'
+              ? '#3B82F6'
+              : bgColor === 'red'
+              ? '#E11D48'
+              : '#10B981',
+        },
+      ]}
+      {...props}
+    >
       {children}
     </Pressable>
   )
@@ -20,7 +38,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     textAlign: 'center',
     borderRadius: 24,
-    boxShadow: 'inset px -4px 2px #2e65be',
+    boxShadow: 'inset px -4px 2px #3b3b3b6f',
   },
 })
 

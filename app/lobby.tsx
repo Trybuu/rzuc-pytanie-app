@@ -8,7 +8,14 @@ import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
 import { router, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native'
 
 export default function Lobby() {
   const navigation = useNavigation()
@@ -60,12 +67,23 @@ export default function Lobby() {
       setCategoryList(lobbyData.categories)
     }
 
+    const handleGameStarted = (lobbyData: LobbyType) => {
+      setLobby(lobbyData)
+
+      // Przekierowanie do ekranu gry
+      router.replace({
+        pathname: '/game',
+        params: { accessCode: lobbyData.accessCode },
+      })
+    }
     socket.on('lobbyCreated', handleLobbyCreated)
     socket.on('lobbyUpdated', handleLobbyUpdated)
+    socket.on('gameStarted', handleGameStarted)
 
     return () => {
       socket.off('lobbyCreated', handleLobbyCreated)
       socket.off('lobbyUpdated', handleLobbyUpdated)
+      socket.off('gameStarted', handleGameStarted)
     }
   }, [setPlayers, setRounds, setCategoryList])
 
@@ -113,6 +131,31 @@ export default function Lobby() {
       pathname: '/joinGame',
     })
     socket.connect()
+  }
+
+  // Rozpocznij grę
+  const handleStartGame = () => {
+    if (!isHost) return
+    // Sprawdź, czy wybrano kategorie pytań i czy jest więcej niż 1 gracz!!!
+    if (categories.length < 1) {
+      Alert.alert('Wybierz przynajmniej jedną kategorię pytań')
+      return
+    } else if (players.length < 2) {
+      Alert.alert('Do rozpoczęcia gry potrzebujesz przynajmniej 2 graczy')
+      return
+    }
+
+    socket.emit(
+      'startGame',
+      { accessCode, categories, rounds },
+      (response: { success: boolean }) => {
+        if (response.success) {
+          Alert.alert('Gra rozpoczęta')
+        } else {
+          console.error('Błąd podczas rozpoczynania gry')
+        }
+      },
+    )
   }
 
   if (players)
@@ -219,7 +262,7 @@ export default function Lobby() {
         </ScrollView>
 
         {isHost ? (
-          <MyButton>
+          <MyButton onPress={handleStartGame}>
             <MyText align="center">Zaczynamy!</MyText>
           </MyButton>
         ) : (

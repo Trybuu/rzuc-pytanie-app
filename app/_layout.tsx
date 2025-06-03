@@ -77,6 +77,14 @@ export default function RootLayout() {
             gestureEnabled: false,
           }}
         />
+        <Stack.Screen
+          name="game"
+          options={{
+            headerShown: false,
+            title: 'Gra',
+            gestureEnabled: false,
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   )
