@@ -7,6 +7,7 @@ export type Question = {
   isCustomQuestion: boolean
   answers: string[]
   points: number
+  category_id: number
 }
 
 export type Player = {
@@ -26,14 +27,14 @@ export type Category = {
 }
 
 export type GameStatus =
-  | 'lobbyWaiting' // Przed rozpoczęciem gry, przygotowywanie pytań itp.
-  | 'roundStarting' // Rozpoczęcie nowej rundy, informacja o tym, czyja jest kolej
-  | 'diceRoll' // Faza rzutu kostką
-  | 'questionDisplay' // Wyświetlanie pytania
-  | 'answerPhase' // Czas na odpowiedź na pytanie
-  | 'answerEvaluation' // Ocena odpowiedzi (np. przez hosta lub automatycznie)
-  | 'roundEnd' // Koniec rundy, podsumowanie, przejście do kolejnego gracza/rundy
-  | 'gameOver' // Gra zakończona
+  | 'startingGame'
+  | 'playerTurn'
+  | 'rollingDicePhase'
+  | 'rollTheDice'
+  | 'questionPhase'
+  | 'nextPlayerTurn'
+  | 'showAnswerPhase'
+  | 'gameOver'
 
 export type Lobby = {
   hostId: string
@@ -48,6 +49,9 @@ export type Lobby = {
   hasCustomCategory?: boolean
   allCategories?: Category[]
   gameStatus: GameStatus
+  lastDiceRoll?: number
+  drawnQuestion: Question | null
+  questionAnswer: string | null
 }
 
 type LobbyState = {
@@ -63,6 +67,9 @@ type LobbyState = {
   hasCustomCategory?: boolean
   allCategories?: Category[]
   gameStatus: GameStatus
+  lastDiceRoll?: number
+  drawnQuestion: Question | null
+  questionAnswer: string | null
   setLobby: (lobby: Lobby) => void
   resetLobby: () => void
   setPlayers: (players: Player[]) => void
@@ -83,7 +90,9 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   categories: [],
   playerTurnIndex: 0,
   currentCategoryIndex: 0,
-  gameStatus: 'changingPlayer',
+  gameStatus: 'startingGame',
+  drawnQuestion: null,
+  questionAnswer: null,
   setLobby: (lobby) => set(() => ({ ...lobby })),
   resetLobby: () =>
     set(() => ({

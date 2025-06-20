@@ -61,8 +61,10 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
       const questions = inputValues.map((value, index) => ({
         id: Math.random().toString(36).substring(2, 15),
         question: value.trim(),
-        isCustomQuestion: true,
+        is_custom: true,
+        category_id: 0,
         answers: null,
+        answer: null,
         points: null,
         isAnswered: false,
         difficulty: index + 1,
