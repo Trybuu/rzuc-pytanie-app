@@ -1,7 +1,9 @@
 import MyText from '@/components/MyText'
-import { StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { getCategories } from '@/api/category'
+import BackgroundWrapper from '@/components/BackgroundWrapper'
+import { useHeaderHeight } from '@react-navigation/elements'
 import { useQuery } from '@tanstack/react-query'
 
 type CategoryType = {
@@ -24,44 +26,61 @@ export default function QuestionCategories() {
     refetchOnMount: false,
   })
 
+  const headerHeight = useHeaderHeight()
+
   if (isLoading) {
     return (
-      <View style={styles.loadingAndErrorContainer}>
-        <MyText align="center">Loading...</MyText>
-      </View>
+      <BackgroundWrapper>
+        <View
+          style={[
+            styles.loadingAndErrorContainer,
+            { paddingTop: headerHeight },
+          ]}
+        >
+          <MyText align="center">Loading...</MyText>
+        </View>
+      </BackgroundWrapper>
     )
   }
 
   if (isError) {
     return (
-      <View style={styles.loadingAndErrorContainer}>
-        <MyText align="center">
-          Błąd w trakcie pobierania kategorii ({error.message})
-        </MyText>
-      </View>
+      <BackgroundWrapper>
+        <View
+          style={[
+            styles.loadingAndErrorContainer,
+            { paddingTop: headerHeight },
+          ]}
+        >
+          <MyText align="center">
+            Błąd w trakcie pobierania kategorii ({error.message})
+          </MyText>
+        </View>
+      </BackgroundWrapper>
     )
   }
 
   return (
-    <View style={styles.viewWrapper}>
-      <View style={styles.categoriesContainer}>
-        {categories &&
-          categories.map((category, index) => {
-            return (
-              <View key={index} style={styles.categoryContainer}>
-                <MyText>{category.name}</MyText>
-              </View>
-            )
-          })}
-      </View>
-    </View>
+    <BackgroundWrapper>
+      <ScrollView style={[styles.viewWrapper, { paddingTop: headerHeight }]}>
+        <View style={styles.categoriesContainer}>
+          {categories &&
+            categories.map((category, index) => {
+              return (
+                <View key={index} style={styles.categoryContainer}>
+                  <MyText>{category.name}</MyText>
+                </View>
+              )
+            })}
+        </View>
+      </ScrollView>
+    </BackgroundWrapper>
   )
 }
 
 const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
-    backgroundColor: '#2B2F41',
     padding: 24,
   },
 
@@ -73,7 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#FF9D00',
+    borderColor: '#FDD988',
     borderRadius: 24,
   },
 
@@ -81,7 +100,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#2B2F41',
     padding: 24,
   },
 })

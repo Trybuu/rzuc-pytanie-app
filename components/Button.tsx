@@ -15,12 +15,12 @@ const MyButton: React.FC<MyButtonProps> = ({
       style={[
         styles.button,
         {
-          backgroundColor:
+          backgroundImage:
             bgColor === 'blue'
-              ? '#3B82F6'
+              ? 'linear-gradient(90deg, #A017F4, #5D0D8E, #7E12C1)'
               : bgColor === 'red'
-              ? '#E11D48'
-              : '#10B981',
+              ? 'linear-gradient(90deg, #e60c0c, #a52020, #c21717)'
+              : 'linear-gradient(90deg, #0ce61e, #269e36, #25a745)',
         },
       ]}
       {...props}
@@ -33,12 +33,13 @@ const MyButton: React.FC<MyButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     marginVertical: 12,
-    backgroundColor: '#3B82F6',
+    backgroundImage: 'linear-gradient(90deg, #A017F4, #5D0D8E, #7E12C1)',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    textAlign: 'center',
-    borderRadius: 24,
-    boxShadow: 'inset px -4px 2px #3b3b3b6f',
+    borderWidth: 1.5,
+    borderColor: '#ffffff',
+    borderRadius: 100,
+    boxShadow: '0 0 100px rgba(211, 23, 211, 0.75)',
   },
 })
 

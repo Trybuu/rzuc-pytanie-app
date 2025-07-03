@@ -6,7 +6,7 @@ type MyTextProps = TextProps & {
   align?: 'left' | 'center' | 'right'
   bold?: boolean
   size?: 's' | 'm' | 'l'
-  color?: 'white' | 'gray' | 'orange'
+  color?: 'white' | 'gray' | 'orange' | 'purple'
 }
 
 const MyText: React.FC<MyTextProps> = ({
@@ -30,6 +30,8 @@ const MyText: React.FC<MyTextProps> = ({
               ? '#FFF'
               : color === 'orange'
               ? '#FF9D00'
+              : color === 'purple'
+              ? '#A017F4'
               : '#D9DBDE',
         },
       ]}

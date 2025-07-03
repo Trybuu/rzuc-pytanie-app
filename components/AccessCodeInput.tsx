@@ -73,16 +73,17 @@ const styles = StyleSheet.create({
   },
 
   codeInputTile: {
-    marginHorizontal: 6,
-    boxShadow: '2px 4px 5px rgba(0, 0, 0, 0.5)',
-    borderRadius: 12,
     height: 64,
     width: 64,
+    marginHorizontal: 6,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    fontFamily: 'MuseoModerno',
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'MuseoModerno',
     fontSize: 24,
     borderWidth: 2,
-    borderColor: 'rgb(255,157,0)',
+    borderRadius: 12,
+    borderColor: '#FDD988',
+    boxShadow: '2px 4px 5px rgba(0, 0, 0, 0.5)',
   },
 })

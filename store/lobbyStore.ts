@@ -17,6 +17,7 @@ export type Player = {
   questionsTargetPlayerId?: string
   isReady: boolean
   questions: Question[]
+  points: number
 }
 
 export type Category = {
@@ -52,6 +53,7 @@ export type Lobby = {
   lastDiceRoll?: number
   drawnQuestion: Question | null
   questionAnswer: string | null
+  markedAnswer: string
 }
 
 type LobbyState = {
@@ -60,7 +62,7 @@ type LobbyState = {
   accessCode: string
   rounds: number
   categories: number[]
-  currentRound?: number
+  currentRound: number
   roundsTotal?: number
   playerTurnIndex: number
   currentCategoryIndex: number
@@ -70,6 +72,7 @@ type LobbyState = {
   lastDiceRoll?: number
   drawnQuestion: Question | null
   questionAnswer: string | null
+  markedAnswer: string
   setLobby: (lobby: Lobby) => void
   resetLobby: () => void
   setPlayers: (players: Player[]) => void
@@ -80,6 +83,8 @@ type LobbyState = {
   toggleCategory: (accessCode: string, id: number) => void
   setCategoryList: (categories: number[]) => void
   setGameStatus: (status: GameStatus) => void
+  setMarkedAnswer: (markedAnswer: string) => void
+  setPlayerPoints: (playerId: string, points: number) => void
 }
 
 export const useLobbyStore = create<LobbyState>((set) => ({
@@ -87,12 +92,14 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   players: [],
   accessCode: '',
   rounds: 1,
+  currentRound: 1,
   categories: [],
   playerTurnIndex: 0,
   currentCategoryIndex: 0,
   gameStatus: 'startingGame',
   drawnQuestion: null,
   questionAnswer: null,
+  markedAnswer: '',
   setLobby: (lobby) => set(() => ({ ...lobby })),
   resetLobby: () =>
     set(() => ({
@@ -126,4 +133,12 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   setCategoryList: (categories) => set({ categories }),
   setGameStatus: (gameStatus: GameStatus) =>
     set((state) => ({ gameStatus: gameStatus })),
+  setMarkedAnswer: (markedAnswer: string) =>
+    set((state) => ({ markedAnswer: markedAnswer })),
+  setPlayerPoints: (playerId: string, points: number) =>
+    set((state) => ({
+      players: state.players.map((p) =>
+        p.id === playerId ? { ...p, points } : p,
+      ),
+    })),
 }))

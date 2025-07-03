@@ -26,6 +26,36 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const apiUrl = 'http://192.168.1.11:3000/api/v1'
+
+  const uploadImageToServer = async (localUri: string) => {
+    const filename = localUri.split('/').pop()
+    const match = /\.(\w+)$/.exec(filename || '')
+    const type = match ? `image/${match[1]}` : `image`
+
+    const formData = new FormData()
+    formData.append('photo', {
+      uri: localUri,
+      name: filename,
+      type,
+    } as any)
+
+    try {
+      const res = await fetch(`${apiUrl}/photos/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      })
+
+      const data = await res.json()
+      setImage(`${apiUrl}/photos/${data.url.split('/').pop()}`)
+    } catch (err) {
+      console.error('Błąd uploadu:', err)
+    }
+  }
+
   const handleWebFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -73,44 +103,46 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-      base64: true,
     })
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri)
+      const localUri = result.assets[0].uri
+      await uploadImageToServer(localUri)
     }
   }
 
   const pickFromGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-      base64: true,
     })
 
-    console.log(result)
-
     if (!result.canceled) {
-      const base64 = result.assets[0].base64
-      setImage(`data:image/jpeg;base64,${base64}`)
+      const localUri = result.assets[0].uri
+      await uploadImageToServer(localUri)
     }
   }
 
   return (
     <View style={styles.createPlayerView}>
       <MyText align="center">Kim jesteś? Zaskocz znajomych!</MyText>
-      <Pressable onPress={pickImage}>
-        <Image
-          source={
-            image !== ''
-              ? { uri: image }
-              : require('@/assets/images/add-image.png')
-          }
-          style={styles.image}
-        />
-      </Pressable>
+
+      <View style={styles.imagePickerWrapper}>
+        <Pressable onPress={pickImage}>
+          <View style={styles.glowWrapper}>
+            <Image
+              source={
+                image !== ''
+                  ? { uri: image }
+                  : require('@/assets/images/graphics/add_photo_sphere.png')
+              }
+              style={styles.image}
+            />
+          </View>
+        </Pressable>
+      </View>
 
       {/* Web-only input */}
       {Platform.OS === 'web' && (
@@ -125,10 +157,11 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       <MyText align="center">
         {playerName.trim() === '' ? 'Twoje imię' : playerName}
       </MyText>
+
       <TextInput
         value={playerName}
         placeholder="Twoje imię"
-        placeholderTextColor={'#fff'}
+        placeholderTextColor={'#FDD988'}
         onChange={(e) => setPlayerName(e.nativeEvent.text)}
         style={styles.input}
       ></TextInput>
@@ -140,26 +173,53 @@ const styles = StyleSheet.create({
   createPlayerView: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  imagePickerWrapper: {
+    paddingVertical: 24,
   },
 
   image: {
     height: 192,
     width: 192,
+    borderWidth: 1,
+    borderColor: '#FDD988',
     borderRadius: 100,
     marginVertical: 24,
+    shadowColor: '#FDD988',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+
+  glowWrapper: {
+    height: 192,
+    width: 192,
+    borderRadius: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#9b5de5',
+    opacity: 1,
+    position: 'relative',
+    shadowColor: '#9b5de5',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 100,
+    elevation: 100,
   },
 
   input: {
+    width: '100%',
     marginVertical: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    width: '100%',
-    color: '#fff',
-    fontFamily: 'MuseoModerno',
-    backgroundColor: '#232638',
-    borderRadius: 24,
 
-    boxShadow: '-2px -2px 1px rgba(0,0,0,0.5)',
+    borderWidth: 4,
+    borderRadius: 100,
+    borderColor: '#FDD988',
+    color: '#FDD988',
   },
 })
 

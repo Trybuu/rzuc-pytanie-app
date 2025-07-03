@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
+import BackgroundWrapper from './BackgroundWrapper'
 
 type GamePrepareQuestionsProps = {
   players: Player[]
@@ -97,65 +98,67 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
   }
 
   return (
-    <ScrollView style={styles.viewWrapper}>
-      <View>
-        <MyText align="center" size="l">
-          Dodaj własne pytania
-        </MyText>
+    <BackgroundWrapper>
+      <ScrollView style={styles.viewWrapper}>
         <View>
-          <MyText align="center">Zadajesz pytania graczowi</MyText>
-          <MyText align="center" color="orange">
-            {questionTargetPlayer?.playerName}
+          <MyText align="center" size="l">
+            Dodaj własne pytania
+          </MyText>
+          <View>
+            <MyText align="center">Zadajesz pytania graczowi</MyText>
+            <MyText align="center" color="orange">
+              {questionTargetPlayer?.playerName}
+            </MyText>
+          </View>
+          <MyText align="center" size="s" color="gray">
+            Im więcej oczek tym pytanie powinno być trudniejsze. Pytania te są
+            anonimowe. Pytania mogą być najróżniejsze, od sprawdzenia wiedzy z
+            różnych kategorii aż po sferę prywatną. Daj upust swojej wyobraźni!
           </MyText>
         </View>
-        <MyText align="center" size="s" color="gray">
-          Im więcej oczek tym pytanie powinno być trudniejsze. Pytania te są
-          anonimowe. Pytania mogą być najróżniejsze, od sprawdzenia wiedzy z
-          różnych kategorii aż po sferę prywatną. Daj upust swojej wyobraźni!
-        </MyText>
-      </View>
 
-      <View>
-        {inputIds.map((input, index) => (
-          <View key={input}>
-            <MyText align="left" size="s" color="gray">
-              Pytanie {index + 1}
-            </MyText>
-            <View style={styles.inputWrapper}>
-              <Image
-                source={dieImages[index]}
-                style={{ width: 24, height: 24 }}
-              />
-              <TextInput
-                style={styles.textInput}
-                value={inputValues[index]}
-                onChange={(e) =>
-                  handleChangeInputValue(e.nativeEvent.text, index)
-                }
-              ></TextInput>
+        <View>
+          {inputIds.map((input, index) => (
+            <View key={input}>
+              <MyText align="left" size="s" color="gray">
+                Pytanie {index + 1}
+              </MyText>
+              <View style={styles.inputWrapper}>
+                <Image
+                  source={dieImages[index]}
+                  style={{ width: 24, height: 24 }}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  value={inputValues[index]}
+                  onChange={(e) =>
+                    handleChangeInputValue(e.nativeEvent.text, index)
+                  }
+                ></TextInput>
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
 
-      <MyButton
-        bgColor={player?.isReady ? 'green' : 'red'}
-        onPress={() => handleReadyChange(!player?.isReady)}
-      >
-        <MyText align="center">
-          {player?.isReady ? 'Gotów' : 'Niegotowy'}
+        <MyButton
+          bgColor={player?.isReady ? 'green' : 'red'}
+          onPress={() => handleReadyChange(!player?.isReady)}
+        >
+          <MyText align="center">
+            {player?.isReady ? 'Gotów' : 'Niegotowy'}
+          </MyText>
+        </MyButton>
+
+        <MyText align="center" size="s" color="gray">
+          {player?.isReady
+            ? 'Jesteś gotowy, czekaj na rozpoczęcie gry'
+            : 'Aktualnie jesteś niegotowy'}
         </MyText>
-      </MyButton>
-
-      <MyText align="center" size="s" color="gray">
-        {player?.isReady
-          ? 'Jesteś gotowy, czekaj na rozpoczęcie gry'
-          : 'Aktualnie jesteś niegotowy'}
-      </MyText>
-      <MyText align="center" size="s" color="gray">
-        {playersReadyCount} / {players.length} graczy gotowych
-      </MyText>
-    </ScrollView>
+        <MyText align="center" size="s" color="gray">
+          {playersReadyCount} / {players.length} graczy gotowych
+        </MyText>
+      </ScrollView>
+    </BackgroundWrapper>
   )
 }
 
@@ -164,7 +167,6 @@ export default GamePrepareQuestions
 const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
-    backgroundColor: '#2B2F41',
     paddingHorizontal: 24,
     paddingVertical: 48,
   },
@@ -174,8 +176,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 14,
     padding: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderWidth: 2,
-    borderColor: '#FF9D00',
+    borderColor: '#FDD988',
     borderRadius: 24,
   },
 

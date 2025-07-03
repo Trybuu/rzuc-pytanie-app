@@ -6,7 +6,7 @@ type ExitGameButtonProps = PressableProps
 const ExitGameButton: React.FC<ExitGameButtonProps> = (props) => {
   return (
     <Pressable style={styles.button} {...props}>
-      <AntDesign name="close" size={16} color="#eba9b4" />
+      <AntDesign name="close" size={16} color="#fff" />
       <Text style={styles.buttonText}>Wyjdź z lobby</Text>
     </Pressable>
   )
@@ -19,17 +19,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flexGrow: 0,
-    marginVertical: 12,
-    padding: 6,
-    borderRadius: 24,
-    backgroundColor: '#E11D48',
-    boxShadow: 'inset 2px -4px 2px rgb(194, 31, 66)',
+    backgroundImage: 'linear-gradient(90deg, #b82020, #860606, #ce1a1a)',
+    paddingVertical: 12,
+    paddingHorizontal: 6,
+    borderWidth: 1.5,
+    borderColor: '#ce1a1a',
+    borderRadius: 100,
+    boxShadow: '0 0 100px rgba(206, 26, 26, 0.75)',
   },
 
   buttonText: {
-    color: '#eba9b4',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 14,
     fontFamily: 'MuseoModerno',
     marginLeft: 6,
   },

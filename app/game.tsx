@@ -1,15 +1,23 @@
 // Game.tsx
 import socket from '@/client/socket'
+import BackgroundWrapper from '@/components/BackgroundWrapper'
 import MyButton from '@/components/Button'
+import CategoryDisplay from '@/components/CategoryDisplay'
 import GamePrepareQuestions from '@/components/GamePrepareQuestions'
 import MyText from '@/components/MyText'
+import PlayerAnswerView from '@/components/PlayerAnswerView'
+import PlayerRollDiceView from '@/components/PlayerRollDiceView'
+import PlayerShowAnswerView from '@/components/PlayerShowAnswerView'
+import PlayersLeaderboard from '@/components/PlayersLeaderboard'
+import PlayerTurnView from '@/components/PlayerTurnView'
+import RoundNumberDisplay from '@/components/RoundNumberDisplay'
 import { GameStatus, Lobby, Player, useLobbyStore } from '@/store/lobbyStore'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Image, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 const Game = () => {
-  const [socketId, setSocketId] = useState<string | undefined>()
+  const [socketId, setSocketId] = useState<string>('')
   const {
     accessCode,
     players,
@@ -29,6 +37,9 @@ const Game = () => {
     lastDiceRoll,
     drawnQuestion,
     questionAnswer,
+    markedAnswer,
+    setMarkedAnswer,
+    setPlayerPoints,
   } = useLobbyStore((state) => state)
 
   const currentPlayer = players[playerTurnIndex]
@@ -45,11 +56,12 @@ const Game = () => {
   const [isAnswerVisible, setAnswerVisible] = useState(false)
 
   useEffect(() => {
-    if (socket.connected) {
+    if (socket.connected && socket.id) {
       setSocketId(socket.id)
     } else {
       socket.on('connect', () => {
-        setSocketId(socket.id)
+        const socketId = socket.id ?? ''
+        setSocketId(socketId)
       })
     }
   }, [])
@@ -85,16 +97,35 @@ const Game = () => {
       setLobby(lobby)
     }
 
+    const handleMarkedAnswerUpdated = (answer: string) => {
+      console.log('Odpowiedź zaznaczona:', answer)
+      setMarkedAnswer(answer)
+    }
+
+    const handleUpdatePlayerPoints = ({
+      playerId,
+      points,
+    }: {
+      playerId: string
+      points: number
+    }) => {
+      setPlayerPoints(playerId, points)
+    }
+
     socket.on('playersUpdated', handlePlayersUpdated)
     socket.on('gameStatusUpdated', handleGameStatusUpdated)
     socket.on('lobbyUpdated', handleLobbyUpdated)
+    socket.on('markedAnswerUpdated', handleMarkedAnswerUpdated)
+    socket.on('playerPointsUpdated', handleUpdatePlayerPoints)
 
     return () => {
       socket.off('playersUpdated', handlePlayersUpdated)
       socket.off('gameStatusUpdated', handleGameStatusUpdated)
       socket.off('lobbyUpdated', handleLobbyUpdated)
+      socket.off('markedAnswerUpdated', handleMarkedAnswerUpdated)
+      socket.off('playerPointsUpdated', handleUpdatePlayerPoints)
     }
-  }, [setPlayers, setGameStatus, setLobby])
+  }, [setPlayers, setGameStatus, setLobby, setMarkedAnswer, setPlayerPoints])
 
   useEffect(() => {
     const current = players.find((p) => p.id === socket.id)
@@ -132,6 +163,35 @@ const Game = () => {
     emitGameAction('showAnswerPhase')
   }
 
+  const handleSetMarkedAnswer = (answer: string) => {
+    console.log('Setting marked answer:', answer)
+    socket.emit(
+      'setMarkedAnswer',
+      { accessCode, answer },
+      (response: { success: boolean }) => {
+        if (response.success) {
+          setMarkedAnswer(answer)
+        } else {
+          console.error('Błąd podczas ustawiania zaznaczonej odpowiedzi')
+        }
+      },
+    )
+  }
+
+  const handleJudgePlayerAnswer = (playerId: string) => {
+    socket.emit(
+      'judgePlayerAnswer',
+      { accessCode, playerId },
+      (response: { success: boolean }) => {
+        if (response.success) {
+          console.log(`Dodano ileś punktów graczowi ${playerId}`)
+        } else {
+          console.error('Błąd podczas dodawania punktów')
+        }
+      },
+    )
+  }
+
   const handleExitLobby = () => {
     socket.disconnect()
     resetLobby()
@@ -142,104 +202,52 @@ const Game = () => {
   }
 
   const renderGameContent = (gameStatus: GameStatus) => {
-    console.log('Aktualny status gry:', gameStatus)
     switch (gameStatus) {
       case 'startingGame':
         return (
-          <View key={players[playerTurnIndex]?.id}>
-            <Image
-              source={{ uri: players[playerTurnIndex]?.avatar }}
-              style={{
-                width: 156,
-                height: 156,
-                borderRadius: 100,
-                marginBottom: 12,
-              }}
-            />
-            <MyText>Odpowiada {currentPlayer.playerName}</MyText>
-
-            {isCurrentPlayer ? (
-              <MyButton onPress={() => handlePlayerTurnReady()}>
-                <MyText align="center">Lecimy!</MyText>
-              </MyButton>
-            ) : (
-              <MyText align="center" size="s" color="gray">
-                Oczekiwanie na gracza...
-              </MyText>
-            )}
-          </View>
+          <PlayerTurnView
+            players={players}
+            currentPlayer={currentPlayer}
+            playerTurnIndex={playerTurnIndex}
+            handlePlayerTurnReady={handlePlayerTurnReady}
+          />
         )
 
       case 'rollingDicePhase':
         return (
-          <View>
-            {isCurrentPlayer ? (
-              <MyText align="center" size="s">
-                Rzucaj kością!
-              </MyText>
-            ) : null}
-            {isCurrentPlayer ? (
-              <MyButton onPress={() => handleRollingDice()}>
-                <MyText align="center">Rzut kością</MyText>
-              </MyButton>
-            ) : (
-              <MyText align="center" size="s">
-                Czekaj na rzut gracza {currentPlayer.playerName}
-              </MyText>
-            )}
-          </View>
+          <PlayerRollDiceView
+            currentPlayer={currentPlayer}
+            isCurrentPlayer={isCurrentPlayer}
+            handleRollingDice={handleRollingDice}
+          />
         )
 
       case 'questionPhase':
         return (
-          <View>
-            <MyText align="center" size="l">
-              Odpowiada {currentPlayer.playerName}
-            </MyText>
-
-            {lastDiceRoll && drawnQuestion && (
-              <View>
-                <MyText align="center" size="m">
-                  Wyrzucono {lastDiceRoll}
-                </MyText>
-                <MyText align="center" size="m">
-                  {drawnQuestion.question}
-                </MyText>
-
-                {/* Jeśli jest odpowiedź na pytanie zmień status gry na fazę sprawdzenia odpowiedzi */}
-                {isCurrentPlayer && questionAnswer && (
-                  <MyButton onPress={handleShowAnswer}>
-                    <MyText align="center">Sprawdź odpowiedź</MyText>
-                  </MyButton>
-                )}
-
-                {/* Jeśli nie ma odpowiedzi na pytanie. Wyświetl przycisk przejścia do kolejnego gracza */}
-                {isCurrentPlayer && !questionAnswer && (
-                  <MyButton onPress={handleNextPlayerTurn}>
-                    <MyText align="center">Kolejna osoba</MyText>
-                  </MyButton>
-                )}
-              </View>
-            )}
-          </View>
+          <PlayerAnswerView
+            lastDiceRoll={lastDiceRoll}
+            drawnQuestion={drawnQuestion}
+            questionAnswer={questionAnswer}
+            isCurrentPlayer={isCurrentPlayer}
+            markedAnswer={markedAnswer}
+            handleNextPlayerTurn={handleNextPlayerTurn}
+            handleShowAnswer={handleShowAnswer}
+            handleSetMarkedAnswer={handleSetMarkedAnswer}
+          />
         )
 
       case 'showAnswerPhase':
         return (
-          <View>
-            <MyText align="center" size="s">
-              Poprawna odpowiedź to
-            </MyText>
-            <MyText align="center" size="l" color="orange">
-              {questionAnswer}
-            </MyText>
-
-            {isCurrentPlayer && (
-              <MyButton onPress={handleNextPlayerTurn}>
-                <MyText align="center">Kolejna osoba</MyText>
-              </MyButton>
-            )}
-          </View>
+          <PlayerShowAnswerView
+            playerId={socketId}
+            drawnQuestion={drawnQuestion}
+            questionAnswer={questionAnswer}
+            isCurrentPlayer={isCurrentPlayer}
+            markedAnswer={markedAnswer}
+            handleNextPlayerTurn={handleNextPlayerTurn}
+            handleSetMarkedAnswer={handleSetMarkedAnswer}
+            handleJudgePlayerAnswer={handleJudgePlayerAnswer}
+          />
         )
 
       case 'gameOver':
@@ -267,17 +275,20 @@ const Game = () => {
     )
 
   return (
-    <View style={styles.viewWrapper}>
-      <View style={styles.gameHeader}>
-        <MyText>{currentCategory?.name}</MyText>
-        <MyText>
-          Runda: {currentRound} / {rounds}
-        </MyText>
-      </View>
+    <BackgroundWrapper>
+      <View style={styles.viewWrapper}>
+        <View style={styles.gameHeader}>
+          <CategoryDisplay categoryName={currentCategory?.name} />
+          <RoundNumberDisplay
+            currentRound={currentRound}
+            roundsTotal={rounds}
+          />
+        </View>
 
-      {/* Wywołujemy nową, czystą funkcję renderującą */}
-      <View style={styles.gameBody}>{renderGameContent(gameStatus)}</View>
-    </View>
+        <PlayersLeaderboard players={players} playerId={socketId} />
+        <View style={styles.gameBody}>{renderGameContent(gameStatus)}</View>
+      </View>
+    </BackgroundWrapper>
   )
 }
 
@@ -286,13 +297,13 @@ export default Game
 const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
-    backgroundColor: '#2B2F41',
-    paddingHorizontal: 24,
-    paddingVertical: 48,
+    padding: 24,
   },
 
   viewContent: {
     marginVertical: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 48,
   },
 
   gameHeader: {
@@ -303,8 +314,6 @@ const styles = StyleSheet.create({
 
   gameBody: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     paddingVertical: 12,
   },
 })
