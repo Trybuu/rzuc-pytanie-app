@@ -1,15 +1,12 @@
 import BackgroundWrapper from '@/components/BackgroundWrapper'
 import ButtonLink from '@/components/ButtonLink'
 import MyText from '@/components/MyText'
-import { useHeaderHeight } from '@react-navigation/elements'
 import { StyleSheet, View } from 'react-native'
 
 export default function Menu() {
-  const headerHeight = useHeaderHeight()
-
   return (
     <BackgroundWrapper>
-      <View style={[styles.viewWrapper, { paddingTop: headerHeight }]}>
+      <View style={styles.viewWrapper}>
         <ButtonLink href="/newGame">
           <MyText align="center">Rozpocznij grę</MyText>
         </ButtonLink>
@@ -30,6 +27,7 @@ export default function Menu() {
 const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
-    padding: 24,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
 })

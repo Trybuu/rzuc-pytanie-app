@@ -36,7 +36,9 @@ export default function HowToPlay() {
 
 const styles = StyleSheet.create({
   viewWrapper: {
-    flex: 1,
+    flexGrow: 1,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
 
   viewContent: {

@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { getCategories } from '@/api/category'
 import BackgroundWrapper from '@/components/BackgroundWrapper'
-import { useHeaderHeight } from '@react-navigation/elements'
 import { useQuery } from '@tanstack/react-query'
 
 type CategoryType = {
@@ -25,8 +24,6 @@ export default function QuestionCategories() {
     staleTime: 1000 * 60 * 5, // 5 minutes cache time
     refetchOnMount: false,
   })
-
-  const headerHeight = useHeaderHeight()
 
   if (isLoading) {
     return (
@@ -62,7 +59,7 @@ export default function QuestionCategories() {
 
   return (
     <BackgroundWrapper>
-      <ScrollView style={[styles.viewWrapper, { paddingTop: headerHeight }]}>
+      <ScrollView style={styles.viewWrapper}>
         <View style={styles.categoriesContainer}>
           {categories &&
             categories.map((category, index) => {
@@ -80,8 +77,9 @@ export default function QuestionCategories() {
 
 const styles = StyleSheet.create({
   viewWrapper: {
-    flex: 1,
-    padding: 24,
+    flexGrow: 1,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
 
   categoriesContainer: {

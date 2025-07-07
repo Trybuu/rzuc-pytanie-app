@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     height: 36,
     width: 36,
     marginLeft: 6,
-    boxShadow: 'inset 2px 2px 2px rgba(0, 0, 0, 0.5)',
+    // boxShadow: 'inset 2px 2px 2px rgba(0, 0, 0, 0.5)',
     borderRadius: 6,
   },
 })

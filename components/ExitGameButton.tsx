@@ -19,13 +19,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundImage: 'linear-gradient(90deg, #b82020, #860606, #ce1a1a)',
+    // backgroundImage: 'linear-gradient(90deg, #b82020, #860606, #ce1a1a)',
     paddingVertical: 12,
     paddingHorizontal: 6,
     borderWidth: 1.5,
     borderColor: '#ce1a1a',
     borderRadius: 100,
-    boxShadow: '0 0 100px rgba(206, 26, 26, 0.75)',
+    // boxShadow: '0 0 100px rgba(206, 26, 26, 0.75)',
   },
 
   buttonText: {

@@ -26,7 +26,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = 'http://192.168.1.11:3000/api/v1'
+  const apiUrl = 'http://192.168.1.2:3000/api/v1'
 
   const uploadImageToServer = async (localUri: string) => {
     const filename = localUri.split('/').pop()

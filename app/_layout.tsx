@@ -1,4 +1,3 @@
-import BackgroundWrapper from '@/components/BackgroundWrapper'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
@@ -25,71 +24,69 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BackgroundWrapper>
-        <Stack
-          screenOptions={{
-            headerLargeTitleShadowVisible: false,
-            headerTintColor: '#fff',
-            headerShadowVisible: false,
-            headerTitleStyle: {
-              fontFamily: 'MuseoModerno',
-              fontSize: 16,
-            },
-            headerStyle: {
-              backgroundColor: 'transparent',
-            },
-            headerTransparent: true,
-            headerBackTitleStyle: {
-              fontFamily: 'MuseoModerno',
-              fontSize: 16,
-            },
+      <Stack
+        screenOptions={{
+          headerLargeTitleShadowVisible: false,
+          headerTintColor: '#fff',
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontFamily: 'MuseoModerno',
+            fontSize: 16,
+          },
+          // headerTransparent: true,
+          headerBackTitleStyle: {
+            fontFamily: 'MuseoModerno',
+            fontSize: 16,
+          },
+        }}
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+            title: 'Start',
           }}
-        >
-          <Stack.Screen
-            name="index"
-            options={{ headerShown: false, title: 'Start' }}
-          />
-          <Stack.Screen
-            name="menu"
-            options={{
-              headerShown: true,
-              title: 'Menu',
-            }}
-          />
-          <Stack.Screen
-            name="newGame"
-            options={{ headerShown: true, title: 'Rozpocznij grę' }}
-          />
-          <Stack.Screen
-            name="joinGame"
-            options={{ headerShown: true, title: 'Dołącz do gry' }}
-          />
-          <Stack.Screen
-            name="howToPlay"
-            options={{ headerShown: true, title: 'Jak grać' }}
-          />
-          <Stack.Screen
-            name="questionCategories"
-            options={{ headerShown: true, title: 'Kategorie pytań' }}
-          />
-          <Stack.Screen
-            name="lobby"
-            options={{
-              headerShown: false,
-              title: 'Gra utworzona',
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="game"
-            options={{
-              headerShown: false,
-              title: 'Gra',
-              gestureEnabled: false,
-            }}
-          />
-        </Stack>
-      </BackgroundWrapper>
+        />
+        <Stack.Screen
+          name="menu"
+          options={{
+            headerShown: false,
+            title: 'Menu',
+          }}
+        />
+        <Stack.Screen
+          name="newGame"
+          options={{ headerShown: false, title: 'Rozpocznij grę' }}
+        />
+        <Stack.Screen
+          name="joinGame"
+          options={{ headerShown: false, title: 'Dołącz do gry' }}
+        />
+        <Stack.Screen
+          name="howToPlay"
+          options={{ headerShown: false, title: 'Jak grać' }}
+        />
+        <Stack.Screen
+          name="questionCategories"
+          options={{ headerShown: false, title: 'Kategorie pytań' }}
+        />
+        <Stack.Screen
+          name="lobby"
+          options={{
+            headerShown: false,
+            title: 'Gra utworzona',
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="game"
+          options={{
+            headerShown: false,
+            title: 'Gra',
+            gestureEnabled: false,
+          }}
+        />
+      </Stack>
     </QueryClientProvider>
   )
 }

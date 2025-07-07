@@ -1,15 +1,12 @@
 import BackgroundWrapper from '@/components/BackgroundWrapper'
 import ButtonLink from '@/components/ButtonLink'
 import MyText from '@/components/MyText'
-import { useHeaderHeight } from '@react-navigation/elements'
 import { Image, StyleSheet, View } from 'react-native'
 
 export default function Index() {
-  const headerHeight = useHeaderHeight()
-
   return (
     <BackgroundWrapper>
-      <View style={[styles.viewWrapper, { paddingTop: headerHeight }]}>
+      <View style={styles.viewWrapper}>
         <View style={[styles.viewContent, styles.viewLogo]}>
           <Image
             source={require('../assets/images/graphics/logo.png')}
@@ -38,12 +35,11 @@ const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
     justifyContent: 'flex-end',
-    padding: 24,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
 
-  viewContent: {
-    marginVertical: 12,
-  },
+  viewContent: {},
 
   viewLogo: {
     flexGrow: 1,

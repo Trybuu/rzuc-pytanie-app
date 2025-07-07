@@ -1,6 +1,7 @@
 import socket from '@/client/socket'
 import { Player } from '@/store/lobbyStore'
-import { Image, StyleSheet, View } from 'react-native'
+import FastImage from 'expo-fast-image'
+import { StyleSheet, View } from 'react-native'
 import MyButton from './Button'
 import MyText from './MyText'
 
@@ -20,9 +21,9 @@ const PlayerTurnView: React.FC<PlayerTurnViewProps> = ({
   const isCurrentPlayer = players[playerTurnIndex]?.id === socket.id
 
   return (
-    <View key={players[playerTurnIndex]?.id} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.currentPlayerContainer}>
-        <Image
+        <FastImage
           source={{ uri: players[playerTurnIndex]?.avatar }}
           style={styles.image}
         />
