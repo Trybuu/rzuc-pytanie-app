@@ -1,4 +1,4 @@
-import BackgroundWrapper from '@/components/BackgroundWrapper'
+import BackButton from '@/components/BackButton'
 import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
@@ -29,22 +29,22 @@ export default function NewGame() {
   }
 
   return (
-    <BackgroundWrapper>
-      <ScrollView contentContainerStyle={styles.viewContent}>
-        <CreatePlayer
-          playerName={playerName}
-          image={image}
-          setPlayerName={setPlayerName}
-          setImage={setImage}
-        />
+    <ScrollView contentContainerStyle={styles.viewContent}>
+      <BackButton />
 
-        <View>
-          <MyButton onPress={handleCreateLobby}>
-            <MyText align="center">Zaczynamy!</MyText>
-          </MyButton>
-        </View>
-      </ScrollView>
-    </BackgroundWrapper>
+      <CreatePlayer
+        playerName={playerName}
+        image={image}
+        setPlayerName={setPlayerName}
+        setImage={setImage}
+      />
+
+      <View>
+        <MyButton onPress={handleCreateLobby}>
+          <MyText align="center">Zaczynamy!</MyText>
+        </MyButton>
+      </View>
+    </ScrollView>
   )
 }
 

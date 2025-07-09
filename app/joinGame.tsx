@@ -1,5 +1,5 @@
 import AccessCodeInput from '@/components/AccessCodeInput'
-import BackgroundWrapper from '@/components/BackgroundWrapper'
+import BackButton from '@/components/BackButton'
 import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
@@ -26,29 +26,29 @@ export default function JoinGame() {
   }
 
   return (
-    <BackgroundWrapper>
-      <ScrollView contentContainerStyle={styles.viewWrapper}>
-        <MyText align="center">
-          Wpisz kod dostępu, aby dołączyć do znajomych!
-        </MyText>
+    <ScrollView contentContainerStyle={styles.viewWrapper}>
+      <BackButton />
 
-        <AccessCodeInput
-          accessCodeArray={accessCode}
-          setAccessCode={setAccessCode}
-        />
+      <MyText align="center">
+        Wpisz kod dostępu, aby dołączyć do znajomych!
+      </MyText>
 
-        <CreatePlayer
-          playerName={playerName}
-          image={image}
-          setPlayerName={setPlayerName}
-          setImage={setImage}
-        />
+      <AccessCodeInput
+        accessCodeArray={accessCode}
+        setAccessCode={setAccessCode}
+      />
 
-        <MyButton onPress={handleJoinLobby}>
-          <MyText align="center">Dołącz</MyText>
-        </MyButton>
-      </ScrollView>
-    </BackgroundWrapper>
+      <CreatePlayer
+        playerName={playerName}
+        image={image}
+        setPlayerName={setPlayerName}
+        setImage={setImage}
+      />
+
+      <MyButton onPress={handleJoinLobby}>
+        <MyText align="center">Dołącz</MyText>
+      </MyButton>
+    </ScrollView>
   )
 }
 

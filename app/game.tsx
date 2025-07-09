@@ -1,6 +1,5 @@
 // Game.tsx
 import socket from '@/client/socket'
-import BackgroundWrapper from '@/components/BackgroundWrapper'
 import MyButton from '@/components/Button'
 import CategoryDisplay from '@/components/CategoryDisplay'
 import GamePrepareQuestions from '@/components/GamePrepareQuestions'
@@ -164,29 +163,31 @@ const Game = () => {
   }
 
   const handleSetMarkedAnswer = (answer: string) => {
-    console.log('Setting marked answer:', answer)
-    socket.emit(
-      'setMarkedAnswer',
-      { accessCode, answer },
-      (response: { success: boolean }) => {
-        if (response.success) {
-          setMarkedAnswer(answer)
-        } else {
-          console.error('Błąd podczas ustawiania zaznaczonej odpowiedzi')
-        }
-      },
-    )
+    if (!isCurrentPlayer) return
+    else {
+      socket.emit(
+        'setMarkedAnswer',
+        { accessCode, answer },
+        (response: { success: boolean }) => {
+          if (response.success) {
+            setMarkedAnswer(answer)
+          } else {
+            console.error('Błąd podczas ustawiania zaznaczonej odpowiedzi')
+          }
+        },
+      )
+    }
   }
 
   const handleJudgePlayerAnswer = (playerId: string) => {
     socket.emit(
       'judgePlayerAnswer',
       { accessCode, playerId },
-      (response: { success: boolean }) => {
+      (response: { success: boolean; message: string }) => {
         if (response.success) {
-          console.log(`Dodano ileś punktów graczowi ${playerId}`)
+          console.log(response.message)
         } else {
-          console.error('Błąd podczas dodawania punktów')
+          console.log(response.message)
         }
       },
     )
@@ -275,20 +276,15 @@ const Game = () => {
     )
 
   return (
-    <BackgroundWrapper>
-      <View style={styles.viewWrapper}>
-        <View style={styles.gameHeader}>
-          <CategoryDisplay categoryName={currentCategory?.name} />
-          <RoundNumberDisplay
-            currentRound={currentRound}
-            roundsTotal={rounds}
-          />
-        </View>
-
-        <PlayersLeaderboard players={players} playerId={socketId} />
-        <View style={styles.gameBody}>{renderGameContent(gameStatus)}</View>
+    <View style={styles.viewWrapper}>
+      <View style={styles.gameHeader}>
+        <CategoryDisplay categoryName={currentCategory?.name} />
+        <RoundNumberDisplay currentRound={currentRound} roundsTotal={rounds} />
       </View>
-    </BackgroundWrapper>
+
+      <PlayersLeaderboard players={players} playerId={socketId} />
+      <View style={styles.gameBody}>{renderGameContent(gameStatus)}</View>
+    </View>
   )
 }
 

@@ -2,7 +2,7 @@ import MyText from '@/components/MyText'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { getCategories } from '@/api/category'
-import BackgroundWrapper from '@/components/BackgroundWrapper'
+import BackButton from '@/components/BackButton'
 import { useQuery } from '@tanstack/react-query'
 
 type CategoryType = {
@@ -27,51 +27,38 @@ export default function QuestionCategories() {
 
   if (isLoading) {
     return (
-      <BackgroundWrapper>
-        <View
-          style={[
-            styles.loadingAndErrorContainer,
-            { paddingTop: headerHeight },
-          ]}
-        >
-          <MyText align="center">Loading...</MyText>
-        </View>
-      </BackgroundWrapper>
+      <View style={styles.loadingAndErrorContainer}>
+        <BackButton />
+        <MyText align="center">Loading...</MyText>
+      </View>
     )
   }
 
   if (isError) {
     return (
-      <BackgroundWrapper>
-        <View
-          style={[
-            styles.loadingAndErrorContainer,
-            { paddingTop: headerHeight },
-          ]}
-        >
-          <MyText align="center">
-            Błąd w trakcie pobierania kategorii ({error.message})
-          </MyText>
-        </View>
-      </BackgroundWrapper>
+      <View style={styles.loadingAndErrorContainer}>
+        <BackButton />
+        <MyText align="center">
+          Błąd w trakcie pobierania kategorii ({error.message})
+        </MyText>
+      </View>
     )
   }
 
   return (
-    <BackgroundWrapper>
-      <ScrollView style={styles.viewWrapper}>
-        <View style={styles.categoriesContainer}>
-          {categories &&
-            categories.map((category, index) => {
-              return (
-                <View key={index} style={styles.categoryContainer}>
-                  <MyText>{category.name}</MyText>
-                </View>
-              )
-            })}
-        </View>
-      </ScrollView>
-    </BackgroundWrapper>
+    <ScrollView style={styles.viewWrapper}>
+      <BackButton />
+      <View style={styles.categoriesContainer}>
+        {categories &&
+          categories.map((category, index) => {
+            return (
+              <View key={index} style={styles.categoryContainer}>
+                <MyText>{category.name}</MyText>
+              </View>
+            )
+          })}
+      </View>
+    </ScrollView>
   )
 }
 
