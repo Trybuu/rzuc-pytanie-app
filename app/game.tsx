@@ -1,7 +1,8 @@
 // Game.tsx
 import socket from '@/client/socket'
-import MyButton from '@/components/Button'
 import CategoryDisplay from '@/components/CategoryDisplay'
+import GameOptions from '@/components/GameOptions'
+import GameOverView from '@/components/GameOverView'
 import GamePrepareQuestions from '@/components/GamePrepareQuestions'
 import MyText from '@/components/MyText'
 import PlayerAnswerView from '@/components/PlayerAnswerView'
@@ -11,13 +12,14 @@ import PlayersLeaderboard from '@/components/PlayersLeaderboard'
 import PlayerTurnView from '@/components/PlayerTurnView'
 import RoundNumberDisplay from '@/components/RoundNumberDisplay'
 import { GameStatus, Lobby, Player, useLobbyStore } from '@/store/lobbyStore'
-import { router } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Alert, StyleSheet, View } from 'react-native'
 
 const Game = () => {
   const [socketId, setSocketId] = useState<string>('')
   const {
+    hostId,
     accessCode,
     players,
     hasCustomCategory,
@@ -39,6 +41,7 @@ const Game = () => {
     markedAnswer,
     setMarkedAnswer,
     setPlayerPoints,
+    setHostId,
   } = useLobbyStore((state) => state)
 
   const currentPlayer = players[playerTurnIndex]
@@ -47,6 +50,8 @@ const Game = () => {
   const currentCategory = allCategories?.find(
     (c) => c.id === categories[currentCategoryIndex],
   )
+
+  const router = useRouter()
 
   console.log('CURRENT CATEGORY INDEX', currentCategoryIndex)
   console.log('CURRENT CATEGORY', currentCategory)
@@ -94,6 +99,7 @@ const Game = () => {
 
     const handleLobbyUpdated = (lobby: Lobby) => {
       setLobby(lobby)
+      setPlayers(lobby.players)
     }
 
     const handleMarkedAnswerUpdated = (answer: string) => {
@@ -111,11 +117,39 @@ const Game = () => {
       setPlayerPoints(playerId, points)
     }
 
+    const handlePlayerDisconected = (playerId: string) => {
+      Alert.alert('Gracz rozłączył się', 'Gra zostanie zakończona.')
+
+      if (socketId === playerId) {
+        router.replace({ pathname: '/menu' })
+      }
+    }
+
+    const handleHostUpdated = (hostId: string) => {
+      setHostId(hostId)
+
+      const newHost = players.find((p) => p.id === hostId)
+      Alert.alert(
+        'Zmieniono gospodarza rozgrywki',
+        'Nowy gospodarz: ' + newHost?.playerName,
+      )
+      console.log('ZMIANA HOSTA!!!: 🥳🥳🥳', hostId)
+    }
+
+    const handleGameReset = (newLobbyState: Lobby) => {
+      console.log('Gra została zresetowana')
+      setLobby(newLobbyState)
+      router.push({ pathname: '/lobby', params: { accessCode } })
+    }
+
     socket.on('playersUpdated', handlePlayersUpdated)
     socket.on('gameStatusUpdated', handleGameStatusUpdated)
     socket.on('lobbyUpdated', handleLobbyUpdated)
     socket.on('markedAnswerUpdated', handleMarkedAnswerUpdated)
     socket.on('playerPointsUpdated', handleUpdatePlayerPoints)
+    socket.on('playerDisconnected', handlePlayerDisconected)
+    socket.on('hostUpdated', handleHostUpdated)
+    socket.on('gameReset', handleGameReset)
 
     return () => {
       socket.off('playersUpdated', handlePlayersUpdated)
@@ -123,8 +157,19 @@ const Game = () => {
       socket.off('lobbyUpdated', handleLobbyUpdated)
       socket.off('markedAnswerUpdated', handleMarkedAnswerUpdated)
       socket.off('playerPointsUpdated', handleUpdatePlayerPoints)
+      socket.off('playerDisconnected', handlePlayerDisconected)
+      socket.off('hostUpdated', handleHostUpdated)
+      socket.off('gameReset', handleGameReset)
     }
-  }, [setPlayers, setGameStatus, setLobby, setMarkedAnswer, setPlayerPoints])
+  }, [
+    setPlayers,
+    setGameStatus,
+    setLobby,
+    setMarkedAnswer,
+    setPlayerPoints,
+    resetLobby,
+    setHostId,
+  ])
 
   useEffect(() => {
     const current = players.find((p) => p.id === socket.id)
@@ -152,6 +197,10 @@ const Game = () => {
 
   const handleRollingDice = () => {
     emitGameAction('rollTheDice')
+  }
+
+  const handleShowQuestion = () => {
+    emitGameAction('showQuestion')
   }
 
   const handleNextPlayerTurn = () => {
@@ -202,6 +251,20 @@ const Game = () => {
     socket.connect()
   }
 
+  const handlePlayAgain = () => {
+    socket.emit(
+      'playAgain',
+      { accessCode },
+      (response: { success: boolean; message: string }) => {
+        if (response.success) {
+          console.log('Gra zostanie wznowiona!')
+        } else {
+          console.log('Błąd podczas próby wznowienia gry:', response.message)
+        }
+      },
+    )
+  }
+
   const renderGameContent = (gameStatus: GameStatus) => {
     switch (gameStatus) {
       case 'startingGame':
@@ -219,7 +282,9 @@ const Game = () => {
           <PlayerRollDiceView
             currentPlayer={currentPlayer}
             isCurrentPlayer={isCurrentPlayer}
+            lastDiceRoll={lastDiceRoll}
             handleRollingDice={handleRollingDice}
+            handleShowQuestion={handleShowQuestion}
           />
         )
 
@@ -253,12 +318,7 @@ const Game = () => {
 
       case 'gameOver':
         return (
-          <View>
-            <MyText>Gra zakończona</MyText>
-            <MyButton bgColor="red" onPress={() => handleExitLobby()}>
-              <MyText align="center">Opuść Lobby</MyText>
-            </MyButton>
-          </View>
+          <GameOverView hostId={hostId} handlePlayAgain={handlePlayAgain} />
         )
 
       default:
@@ -277,6 +337,10 @@ const Game = () => {
 
   return (
     <View style={styles.viewWrapper}>
+      <View style={styles.gameOptionsContainer}>
+        <GameOptions />
+      </View>
+
       <View style={styles.gameHeader}>
         <CategoryDisplay categoryName={currentCategory?.name} />
         <RoundNumberDisplay currentRound={currentRound} roundsTotal={rounds} />
@@ -306,6 +370,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+
+  gameOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 
   gameBody: {

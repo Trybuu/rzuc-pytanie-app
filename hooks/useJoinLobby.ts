@@ -2,6 +2,8 @@ import { emitJoinLobby } from '@/client/events'
 import { useLobbyStore } from '@/store/lobbyStore'
 import { useRouter } from 'expo-router'
 
+type JoinLobbyResult = { success: boolean; message: string; error?: any }
+
 const useJoinLobby = () => {
   const setLobby = useLobbyStore((s) => s.setLobby)
   const router = useRouter()
@@ -10,7 +12,7 @@ const useJoinLobby = () => {
     accessCode: string,
     playerName: string,
     avatar: string,
-  ) => {
+  ): Promise<JoinLobbyResult> => {
     try {
       const lobby = await emitJoinLobby(accessCode, playerName, avatar)
 
@@ -22,6 +24,10 @@ const useJoinLobby = () => {
       router.push({
         pathname: '/lobby',
       })
+      return {
+        success: true,
+        message: 'Dołączono do lobby',
+      }
     } catch (err) {
       return {
         success: false,

@@ -17,8 +17,8 @@ export default function JoinGame() {
     try {
       const result = await join(accessCode.join(''), playerName, image)
 
-      if (!result?.success) {
-        Alert.alert(`Błąd: ${result?.message}`)
+      if (!result.success) {
+        Alert.alert(`Błąd: ${result.message}`)
       }
     } catch (err) {
       console.error('Błąd w trakcie dołączania do lobby: ', err)
@@ -45,7 +45,7 @@ export default function JoinGame() {
         setImage={setImage}
       />
 
-      <MyButton onPress={handleJoinLobby}>
+      <MyButton onPress={handleJoinLobby} bgColor="purple">
         <MyText align="center">Dołącz</MyText>
       </MyButton>
     </ScrollView>

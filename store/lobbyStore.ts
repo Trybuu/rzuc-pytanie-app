@@ -36,6 +36,7 @@ export type GameStatus =
   | 'nextPlayerTurn'
   | 'showAnswerPhase'
   | 'gameOver'
+  | 'showQuestion'
 
 export type Lobby = {
   hostId: string
@@ -50,10 +51,11 @@ export type Lobby = {
   hasCustomCategory?: boolean
   allCategories?: Category[]
   gameStatus: GameStatus
-  lastDiceRoll?: number
+  lastDiceRoll: number | 0
   drawnQuestion: Question | null
   questionAnswer: string | null
   markedAnswer: string
+  gameStarted: boolean
 }
 
 type LobbyState = {
@@ -69,10 +71,11 @@ type LobbyState = {
   hasCustomCategory?: boolean
   allCategories?: Category[]
   gameStatus: GameStatus
-  lastDiceRoll?: number
+  lastDiceRoll: number | 0
   drawnQuestion: Question | null
   questionAnswer: string | null
   markedAnswer: string
+  gameStarted: boolean
   setLobby: (lobby: Lobby) => void
   resetLobby: () => void
   setPlayers: (players: Player[]) => void
@@ -85,6 +88,7 @@ type LobbyState = {
   setGameStatus: (status: GameStatus) => void
   setMarkedAnswer: (markedAnswer: string) => void
   setPlayerPoints: (playerId: string, points: number) => void
+  setHostId: (hostId: string) => void
 }
 
 export const useLobbyStore = create<LobbyState>((set) => ({
@@ -100,6 +104,8 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   drawnQuestion: null,
   questionAnswer: null,
   markedAnswer: '',
+  gameStarted: false,
+  lastDiceRoll: 0,
   setLobby: (lobby) => set(() => ({ ...lobby })),
   resetLobby: () =>
     set(() => ({
@@ -141,4 +147,5 @@ export const useLobbyStore = create<LobbyState>((set) => ({
         p.id === playerId ? { ...p, points } : p,
       ),
     })),
+  setHostId: (hostId: string) => set((state) => ({ hostId: hostId })),
 }))

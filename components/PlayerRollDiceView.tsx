@@ -1,31 +1,46 @@
 import { Player } from '@/store/lobbyStore'
+import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import MyButton from './Button'
+import DiceToRoll from './DiceToRoll'
 import MyText from './MyText'
 
 type PlayerRollDiceViewProps = {
   isCurrentPlayer: boolean
   currentPlayer: Player
+  lastDiceRoll: number
   handleRollingDice: () => void
+  handleShowQuestion: () => void
 }
 
 const PlayerRollDiceView: React.FC<PlayerRollDiceViewProps> = ({
   currentPlayer,
   isCurrentPlayer,
+  lastDiceRoll,
   handleRollingDice,
+  handleShowQuestion,
 }) => {
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+  const onRollDicePress = () => {
+    setIsButtonDisabled(true)
+    handleRollingDice()
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.diceContainer}>
-        <MyText align="center" size="s">
-          Model i animacja rzutu kością
-        </MyText>
-      </View>
+      <DiceToRoll diceFace={lastDiceRoll} />
 
       {isCurrentPlayer ? (
-        <MyButton onPress={handleRollingDice}>
-          <MyText align="center">Przejdź do pytania</MyText>
-        </MyButton>
+        lastDiceRoll === 0 ? (
+          <MyButton onPress={onRollDicePress} disabled={isButtonDisabled}>
+            <MyText align="center">Rzuć kością</MyText>
+          </MyButton>
+        ) : (
+          <MyButton onPress={handleShowQuestion}>
+            <MyText align="center">Przejdź do pytania</MyText>
+          </MyButton>
+        )
       ) : (
         <MyText align="center" size="s">
           Czekaj na rzut gracza {currentPlayer.playerName}...

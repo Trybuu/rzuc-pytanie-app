@@ -3,7 +3,6 @@ import { socketEditLobby } from '@/client/events'
 import socket from '@/client/socket'
 import AccessCodeView from '@/components/AccessCodeView'
 import MyButton from '@/components/Button'
-import ExitGameButton from '@/components/ExitGameButton'
 import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
 import { router, useNavigation } from 'expo-router'
@@ -31,6 +30,7 @@ export default function Lobby() {
     toggleCategory,
     setCategoryList,
     setRounds,
+    setHostId,
   } = useLobbyStore()
 
   // Czy gracz jest hostem rozgrywki
@@ -76,16 +76,30 @@ export default function Lobby() {
         params: { accessCode: lobbyData.accessCode },
       })
     }
+
+    const handleHostUpdated = (hostId: string) => {
+      setHostId(hostId)
+
+      const newHost = players.find((p) => p.id === hostId)
+      Alert.alert(
+        'Zmieniono gospodarza rozgrywki',
+        'Nowy gospodarz: ' + newHost?.playerName,
+      )
+      console.log('ZMIANA HOSTA!!!: 🥳🥳🥳', hostId)
+    }
+
     socket.on('lobbyCreated', handleLobbyCreated)
     socket.on('lobbyUpdated', handleLobbyUpdated)
     socket.on('gameStarted', handleGameStarted)
+    socket.on('hostUpdated', handleHostUpdated)
 
     return () => {
       socket.off('lobbyCreated', handleLobbyCreated)
       socket.off('lobbyUpdated', handleLobbyUpdated)
       socket.off('gameStarted', handleGameStarted)
+      socket.off('hostUpdated', handleHostUpdated)
     }
-  }, [setPlayers, setRounds, setCategoryList])
+  }, [setPlayers, setRounds, setCategoryList, setHostId])
 
   // Zapytania do API
   useEffect(() => {
@@ -124,11 +138,10 @@ export default function Lobby() {
 
   // Opuść grę
   const handleExitGame = () => {
-    console.log('Socket Disconnect')
     socket.disconnect()
     resetLobby()
     router.replace({
-      pathname: '/joinGame',
+      pathname: '/menu',
     })
     socket.connect()
   }
@@ -150,9 +163,9 @@ export default function Lobby() {
       { accessCode, categories, rounds },
       (response: { success: boolean }) => {
         if (response.success) {
-          Alert.alert('Gra rozpoczęta')
+          console.log('Gra rozpoczęta pomyślnie')
         } else {
-          console.error('Błąd podczas rozpoczynania gry')
+          console.log('Błąd podczas rozpoczynania gry')
         }
       },
     )
@@ -163,7 +176,6 @@ export default function Lobby() {
       <ScrollView style={styles.viewWrapper}>
         <View style={styles.accessInfoWrapper}>
           <MyText>Kod dostępu do gry</MyText>
-          {/* <MyText>{accessCode}</MyText> */}
           <AccessCodeView accessCode={accessCode} />
         </View>
 
@@ -251,8 +263,8 @@ export default function Lobby() {
               <Image
                 source={{ uri: player.avatar }}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 42,
+                  height: 42,
                   borderRadius: 100,
                   marginRight: 12,
                 }}
@@ -262,15 +274,19 @@ export default function Lobby() {
           ))}
         </ScrollView>
 
-        {isHost ? (
-          <MyButton onPress={handleStartGame}>
-            <MyText align="center">Zaczynamy!</MyText>
-          </MyButton>
-        ) : (
-          <MyText align="center">Czekaj na rozpoczęcie gry</MyText>
-        )}
+        <View style={styles.controlButtonsContainer}>
+          {isHost ? (
+            <MyButton onPress={handleStartGame}>
+              <MyText align="center">Zaczynamy!</MyText>
+            </MyButton>
+          ) : (
+            <MyText align="center">Czekaj na rozpoczęcie gry</MyText>
+          )}
 
-        <ExitGameButton onPress={() => handleExitGame()} />
+          <MyButton bgColor="red" onPress={() => handleExitGame()}>
+            <MyText align="center">Opuść lobby</MyText>
+          </MyButton>
+        </View>
       </ScrollView>
     )
 }
@@ -298,7 +314,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.1)',
     borderWidth: 2,
     borderColor: '#FDD988',
     borderRadius: 24,
@@ -313,7 +329,7 @@ const styles = StyleSheet.create({
   },
 
   playersWrapper: {
-    maxHeight: 200,
+    maxHeight: 220,
   },
 
   playerElement: {
@@ -323,9 +339,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     marginVertical: 6,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.1)',
     borderWidth: 2,
     borderColor: '#FDD988',
     borderRadius: 24,
+  },
+
+  controlButtonsContainer: {
+    paddingVertical: 24,
   },
 })

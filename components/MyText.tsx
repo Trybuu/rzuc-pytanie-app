@@ -5,8 +5,8 @@ type MyTextProps = TextProps & {
   children: React.ReactNode
   align?: 'left' | 'center' | 'right'
   bold?: boolean
-  size?: 's' | 'm' | 'l'
-  color?: 'white' | 'gray' | 'orange' | 'purple'
+  size?: 's' | 'm' | 'l' | 'xl'
+  color?: 'white' | 'gray' | 'orange' | 'purple' | 'yellow'
 }
 
 const MyText: React.FC<MyTextProps> = ({
@@ -24,7 +24,8 @@ const MyText: React.FC<MyTextProps> = ({
         {
           textAlign: align,
           fontWeight: bold ? '600' : '400',
-          fontSize: size === 's' ? 12 : size === 'm' ? 16 : 18,
+          fontSize:
+            size === 's' ? 12 : size === 'm' ? 16 : size === 'l' ? 18 : 24,
           color:
             color === 'white'
               ? '#FFF'
@@ -32,6 +33,8 @@ const MyText: React.FC<MyTextProps> = ({
               ? '#FF9D00'
               : color === 'purple'
               ? '#A017F4'
+              : color === 'yellow'
+              ? '#FDD988'
               : '#D9DBDE',
         },
       ]}

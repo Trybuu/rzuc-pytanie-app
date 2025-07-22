@@ -28,13 +28,13 @@ const PlayerTurnView: React.FC<PlayerTurnViewProps> = ({
           style={styles.image}
         />
 
-        <MyText align="center" size="s">
+        <MyText align="center" size="m">
           Odpowiada {currentPlayer.playerName}
         </MyText>
       </View>
 
       {isCurrentPlayer ? (
-        <MyButton onPress={handlePlayerTurnReady}>
+        <MyButton onPress={handlePlayerTurnReady} bgColor="purple">
           <MyText align="center">Rzuć kością!</MyText>
         </MyButton>
       ) : (
@@ -62,9 +62,9 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 156,
-    height: 156,
-    borderRadius: 100,
+    width: 230,
+    height: 230,
+    borderRadius: 115,
     marginBottom: 12,
     alignSelf: 'center',
   },

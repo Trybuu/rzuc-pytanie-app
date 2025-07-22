@@ -1,5 +1,5 @@
 import { Question } from '@/store/lobbyStore'
-import { Image, Pressable, StyleSheet, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import MyButton from './Button'
 import MyText from './MyText'
 
@@ -39,7 +39,7 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
     <View style={styles.questionWrapper}>
       <Image
         source={dieImages[lastDiceRoll - 1]}
-        style={{ width: 24, height: 24 }}
+        style={{ width: 32, height: 32, marginBottom: 12 }}
       />
       <MyText align="center" size="m">
         {drawnQuestion.question}
@@ -82,11 +82,11 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {renderDiceAndQuestion()}
       {questionAnswer && renderAnswers()}
-      {renderActionButtons()}
-    </View>
+      <View style={styles.actionButtonsContainer}>{renderActionButtons()}</View>
+    </ScrollView>
   )
 }
 
@@ -120,5 +120,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#FDD988',
     // boxShadow: '0 0 10px 3px rgb(189, 6, 180)',
+  },
+
+  actionButtonsContainer: {
+    paddingVertical: 12,
   },
 })

@@ -40,15 +40,15 @@ const PlayerShowAnswerView: React.FC<PlayerShowAnswerViewProps> = ({
       {shouldShowResult && (
         <View style={styles.answerContainer}>
           {isCorrectAnswer ? (
-            <MyText align="center" size="s">
+            <MyText align="center" size="m">
               Świetnie! Poprawna odpowiedź to
             </MyText>
           ) : (
-            <MyText align="center" size="s">
+            <MyText align="center" size="m">
               Ale szkoda! Poprawna odpowiedź to
             </MyText>
           )}
-          <MyText align="center" size="l" color="orange">
+          <MyText align="center" size="xl" color="orange">
             {questionAnswer}
           </MyText>
         </View>

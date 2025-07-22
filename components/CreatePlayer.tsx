@@ -26,7 +26,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = 'http://192.168.1.2:3000/api/v1'
+  const apiUrl = 'http://192.168.1.13:3000/api/v1'
 
   const uploadImageToServer = async (localUri: string) => {
     const filename = localUri.split('/').pop()
@@ -181,11 +181,12 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    height: 192,
-    width: 192,
-    borderWidth: 1,
+    height: 260,
+    width: 260,
+    resizeMode: 'cover',
+    borderWidth: 2,
     borderColor: '#FDD988',
-    borderRadius: 100,
+    borderRadius: 130,
     marginVertical: 24,
     shadowColor: '#FDD988',
     shadowOffset: { width: 0, height: 0 },
@@ -195,9 +196,9 @@ const styles = StyleSheet.create({
   },
 
   glowWrapper: {
-    height: 192,
-    width: 192,
-    borderRadius: 100,
+    height: 260,
+    width: 260,
+    borderRadius: 130,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#9b5de5',
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
 
-    borderWidth: 4,
+    borderWidth: 2,
     borderRadius: 100,
     borderColor: '#FDD988',
     color: '#FDD988',
