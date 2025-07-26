@@ -1,5 +1,7 @@
 import socket from '@/client/socket'
 import { useLobbyStore } from '@/store/lobbyStore'
+import { Audio } from 'expo-av'
+import { useEffect } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import MyButton from './Button'
 import MyText from './MyText'
@@ -82,6 +84,26 @@ const GameOverView: React.FC<GameOverViewProps> = ({
           Math.floor(Math.random() * victoryPhrasesMale.length)
         ]
     : 'pozamiatał'
+
+  useEffect(() => {
+    let sound: Audio.Sound | null = null
+
+    const playSound = async () => {
+      const soundResult = await Audio.Sound.createAsync(
+        require('@/assets/sounds/effects/victory.mp3'),
+      )
+      sound = soundResult.sound
+      await sound.playAsync()
+    }
+
+    playSound()
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync()
+      }
+    }
+  })
 
   return (
     <View style={styles.container}>

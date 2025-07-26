@@ -138,11 +138,11 @@ export default function Lobby() {
 
   // Opuść grę
   const handleExitGame = () => {
-    socket.disconnect()
-    resetLobby()
     router.replace({
       pathname: '/menu',
     })
+    resetLobby()
+    socket.disconnect()
     socket.connect()
   }
 

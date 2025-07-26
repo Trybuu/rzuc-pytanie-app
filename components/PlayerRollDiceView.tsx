@@ -27,6 +27,18 @@ const PlayerRollDiceView: React.FC<PlayerRollDiceViewProps> = ({
     handleRollingDice()
   }
 
+  // const [isGestureDisabled, setIsGestureDisabled] = useState(false)
+  // const onSwipeUp = () => {
+  //   // setIsGestureDisabled(true)
+  //   handleRollingDice()
+  // }
+
+  // const swipeUpGesture = Gesture.Pan().onEnd((e) => {
+  //   if (e.translationY < -50) {
+  //     onSwipeUp()
+  //   }
+  // })
+
   return (
     <View style={styles.container}>
       <DiceToRoll diceFace={lastDiceRoll} />
@@ -46,6 +58,22 @@ const PlayerRollDiceView: React.FC<PlayerRollDiceViewProps> = ({
           Czekaj na rzut gracza {currentPlayer.playerName}...
         </MyText>
       )}
+
+      {/* {isCurrentPlayer ? (
+        lastDiceRoll === 0 ? (
+          <Animated.View style={styles.swipeZone}>
+            <MyText align="center">Przesuń w górę, aby rzucić kością</MyText>
+          </Animated.View>
+        ) : (
+          <MyButton onPress={handleShowQuestion}>
+            <MyText align="center">Przejdź do pytania</MyText>
+          </MyButton>
+        )
+      ) : (
+        <MyText align="center" size="s">
+          Czekaj na rzut gracza {currentPlayer.playerName}...
+        </MyText>
+      )} */}
     </View>
   )
 }
@@ -64,4 +92,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  // swipeZone: {
+  //   height: 200,
+  //   width: 100,
+  //   backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  // },
 })

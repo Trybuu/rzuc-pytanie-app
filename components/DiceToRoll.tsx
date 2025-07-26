@@ -1,5 +1,13 @@
-import { useEffect, useRef } from 'react'
-import { Animated, Easing, StyleSheet, View } from 'react-native'
+import { Audio } from 'expo-av'
+import React, { useEffect } from 'react'
+import { Image, StyleSheet, View } from 'react-native'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 
 const diceImages: Record<number, any> = {
   1: require('@/assets/images/flat3d-dice/dice-1.png'),
@@ -15,79 +23,71 @@ type DiceToRollProps = {
 }
 
 const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
-  const translateY = useRef(new Animated.Value(0)).current
-  const scale = useRef(new Animated.Value(1)).current
-  const rotate = useRef(new Animated.Value(0)).current
+  const translateY = useSharedValue(0)
+  const scale = useSharedValue(1)
+  const rotate = useSharedValue(0)
 
   useEffect(() => {
-    if (diceFace !== 0) {
-      // Reset
-      translateY.setValue(0)
-      scale.setValue(1)
-      rotate.setValue(0)
+    let sound: Audio.Sound | null = null
 
-      // Animate
-      Animated.sequence([
-        Animated.parallel([
-          Animated.timing(translateY, {
-            toValue: -80,
-            duration: 300,
-            useNativeDriver: true,
-            easing: Easing.out(Easing.quad),
-          }),
-          Animated.timing(scale, {
-            toValue: 1.5,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(rotate, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-            easing: Easing.linear,
-          }),
-        ]),
-        Animated.parallel([
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-            friction: 4,
-          }),
-          Animated.timing(scale, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(rotate, {
-            toValue: 2,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start(() => {
-        // Reset rotation value for reuse
-        rotate.setValue(0)
-      })
+    const playDiceSound = async () => {
+      const result = await Audio.Sound.createAsync(
+        require('@/assets/sounds/dice/dice-roll-1.mp3'),
+      )
+      sound = result.sound
+      await sound.playAsync()
+    }
+
+    if (diceFace >= 1 && diceFace <= 6) {
+      playDiceSound()
+
+      // Sekwencja animacji
+      translateY.value = withSequence(
+        withTiming(-200, { duration: 500 }),
+        withSpring(0, { damping: 20, stiffness: 80 }),
+      )
+      scale.value = withSequence(
+        withTiming(1.8, { duration: 500 }),
+        withTiming(1, { duration: 500 }),
+      )
+      rotate.value = withSequence(
+        withTiming(180, { duration: 400 }),
+        withTiming(720, { duration: 400 }, () => {
+          rotate.value = 0
+        }),
+      )
+    }
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync()
+      }
     }
   }, [diceFace])
 
-  const rotateInterpolate = rotate.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: ['0deg', '180deg', '360deg'],
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: translateY.value },
+        { scale: scale.value },
+        {
+          rotateZ: `${rotate.value}deg`,
+        },
+      ],
+    }
   })
 
-  const animatedStyle = {
-    transform: [{ translateY }, { scale }, { rotateZ: rotateInterpolate }],
-  }
+  const diceSource = diceImages[diceFace] ?? diceImages[1]
 
   return (
     <View style={styles.container}>
-      {diceFace !== 0 && (
-        <Animated.Image
-          source={diceImages[diceFace]}
-          style={[styles.diceImage, animatedStyle]}
+      <Animated.View style={animatedStyle}>
+        <Image
+          source={diceSource}
+          style={styles.diceImage}
+          resizeMode="contain"
         />
-      )}
+      </Animated.View>
     </View>
   )
 }

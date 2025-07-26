@@ -5,16 +5,16 @@ import { StyleSheet, View } from 'react-native'
 export default function Menu() {
   return (
     <View style={styles.viewWrapper}>
-      <ButtonLink href="/newGame">
+      <ButtonLink href="/newGame" withSoundEffect>
         <MyText align="center">Rozpocznij grę</MyText>
       </ButtonLink>
-      <ButtonLink href="/joinGame">
+      <ButtonLink href="/joinGame" withSoundEffect>
         <MyText align="center">Dołącz do gry</MyText>
       </ButtonLink>
-      <ButtonLink href="/howToPlay">
+      <ButtonLink href="/howToPlay" withSoundEffect>
         <MyText align="center">Jak grać</MyText>
       </ButtonLink>
-      <ButtonLink href="/questionCategories">
+      <ButtonLink href="/questionCategories" withSoundEffect>
         <MyText align="center">Kategorie pytań</MyText>
       </ButtonLink>
     </View>

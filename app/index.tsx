@@ -20,7 +20,7 @@ export default function Index() {
         </MyText>
       </View>
       <View style={styles.viewContent}>
-        <ButtonLink href="/menu">
+        <ButtonLink href="/menu" withSoundEffect>
           <MyText align="center">Rozpocznij</MyText>
         </ButtonLink>
       </View>

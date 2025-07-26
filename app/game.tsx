@@ -139,6 +139,9 @@ const Game = () => {
     const handleGameReset = (newLobbyState: Lobby) => {
       console.log('Gra została zresetowana')
       setLobby(newLobbyState)
+
+      console.log('GRA ZRESETOWANA! 🥳🥳🥳')
+      console.log(players)
       router.push({ pathname: '/lobby', params: { accessCode } })
     }
 

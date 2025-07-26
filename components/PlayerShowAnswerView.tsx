@@ -1,4 +1,5 @@
 import { Question } from '@/store/lobbyStore'
+import { Audio } from 'expo-av'
 import { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import MyButton from './Button'
@@ -34,6 +35,36 @@ const PlayerShowAnswerView: React.FC<PlayerShowAnswerViewProps> = ({
       handleJudgePlayerAnswer(playerId)
     }
   }, [markedAnswer])
+
+  // Sound Effect
+  useEffect(() => {
+    let sound: Audio.Sound | null = null
+
+    const playSound = async () => {
+      const correctSoundResult = await Audio.Sound.createAsync(
+        require('@/assets/sounds/effects/correct.mp3'),
+      )
+      const wrongSoundResult = await Audio.Sound.createAsync(
+        require('@/assets/sounds/effects/wrong.mp3'),
+      )
+
+      if (isCorrectAnswer && shouldShowResult) {
+        sound = correctSoundResult.sound
+        await sound.playAsync()
+      } else {
+        sound = wrongSoundResult.sound
+        await sound.playAsync()
+      }
+    }
+
+    playSound()
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync()
+      }
+    }
+  }, [])
 
   return (
     <View style={styles.container}>

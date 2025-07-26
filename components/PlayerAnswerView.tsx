@@ -82,11 +82,14 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {renderDiceAndQuestion()}
-      {questionAnswer && renderAnswers()}
+    <View style={styles.container}>
+      <ScrollView style={styles.content}>
+        {renderDiceAndQuestion()}
+        {questionAnswer && renderAnswers()}
+      </ScrollView>
+
       <View style={styles.actionButtonsContainer}>{renderActionButtons()}</View>
-    </ScrollView>
+    </View>
   )
 }
 
@@ -94,7 +97,12 @@ export default PlayerAnswerView
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  content: {
+    flexGrow: 1,
   },
 
   questionWrapper: {
@@ -111,15 +119,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
+
   answerButton: {
     width: '100%',
     padding: 10,
     marginVertical: 6,
-    // borderRadius: 6,
     borderColor: 'rgba(50,50,50,0.2)',
     borderBottomWidth: 1,
     borderBottomColor: '#FDD988',
-    // boxShadow: '0 0 10px 3px rgb(189, 6, 180)',
   },
 
   actionButtonsContainer: {
