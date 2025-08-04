@@ -25,6 +25,7 @@ export default RoundNumberDisplay
 
 const styles = StyleSheet.create({
   roundsView: {
+    height: '100%',
     padding: 12,
     backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: 12,

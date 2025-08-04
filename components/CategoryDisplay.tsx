@@ -18,6 +18,7 @@ export default CategoryDisplay
 const styles = StyleSheet.create({
   categoryView: {
     flex: 1,
+    height: '100%',
     padding: 12,
     backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: 12,

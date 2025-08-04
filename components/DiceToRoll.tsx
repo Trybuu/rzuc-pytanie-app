@@ -1,13 +1,15 @@
 import { Audio } from 'expo-av'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated'
+import MyText from './MyText'
 
 const diceImages: Record<number, any> = {
   1: require('@/assets/images/flat3d-dice/dice-1.png'),
@@ -23,6 +25,7 @@ type DiceToRollProps = {
 }
 
 const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
+  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false)
   const translateY = useSharedValue(0)
   const scale = useSharedValue(1)
   const rotate = useSharedValue(0)
@@ -54,6 +57,7 @@ const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
         withTiming(180, { duration: 400 }),
         withTiming(720, { duration: 400 }, () => {
           rotate.value = 0
+          runOnJS(setAnimationCompleted)(true)
         }),
       )
     }
@@ -79,8 +83,32 @@ const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
 
   const diceSource = diceImages[diceFace] ?? diceImages[1]
 
+  const renderDifficultyText = () => {
+    if (diceFace === 1 || diceFace === 2) {
+      return (
+        <MyText align="center" color="green" size="xl">
+          Trudność pytania {diceFace}
+        </MyText>
+      )
+    } else if (diceFace === 3 || diceFace === 4) {
+      return (
+        <MyText align="center" color="yellow" size="xl">
+          Trudność pytania {diceFace}
+        </MyText>
+      )
+    } else {
+      return (
+        <MyText align="center" color="red" size="xl">
+          Trudność pytania {diceFace}
+        </MyText>
+      )
+    }
+  }
+
   return (
     <View style={styles.container}>
+      {animationCompleted && renderDifficultyText()}
+
       <Animated.View style={animatedStyle}>
         <Image
           source={diceSource}

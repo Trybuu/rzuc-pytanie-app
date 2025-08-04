@@ -1,4 +1,5 @@
 import { Audio } from 'expo-av'
+import { LinearGradient } from 'expo-linear-gradient'
 import { Link, LinkProps } from 'expo-router'
 import React from 'react'
 import { Pressable, StyleSheet } from 'react-native'
@@ -33,24 +34,34 @@ const ButtonLink: React.FC<ButtonLinkProps> = ({
   }
 
   return (
-    <Link {...props} asChild>
-      <Pressable style={styles.button} onPress={handlePress}>
-        {children}
-      </Pressable>
-    </Link>
+    <LinearGradient
+      colors={['#A017F4', '#661499', '#7E12C1']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.gradient}
+    >
+      <Link {...props} asChild>
+        <Pressable style={styles.button} onPress={handlePress}>
+          {children}
+        </Pressable>
+      </Link>
+    </LinearGradient>
   )
 }
 
 export default ButtonLink
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#7E12C1',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+  gradient: {
+    borderWidth: 1,
     borderRadius: 100,
     marginVertical: 12,
-    alignItems: 'center',
-    zIndex: 100,
+    borderColor: '#A017F4',
+  },
+
+  button: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 100,
   },
 })

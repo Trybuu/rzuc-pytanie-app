@@ -1,17 +1,12 @@
 import ButtonLink from '@/components/ButtonLink'
+import Logo from '@/components/Logo'
 import MyText from '@/components/MyText'
-import { Image, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 export default function Index() {
   return (
     <View style={styles.viewWrapper}>
-      <View style={[styles.viewContent, styles.viewLogo]}>
-        <Image
-          source={require('../assets/images/graphics/logo.png')}
-          style={{ width: 250, height: 250 }}
-          resizeMode="contain"
-        ></Image>
-      </View>
+      <Logo width={250} height={250} />
       <View style={[styles.viewContent, styles.viewDesc]}>
         <MyText align="center">
           Witaj w grze “Rzuć pytanie”, gdzie kostka decyduje, a reszta zależy od
@@ -32,7 +27,7 @@ const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
     justifyContent: 'flex-end',
-    paddingVertical: 48,
+    paddingVertical: 54,
     paddingHorizontal: 24,
     backgroundColor: 'transparent',
   },

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   viewWrapper: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingVertical: 48,
+    paddingVertical: 54,
     paddingHorizontal: 24,
   },
 

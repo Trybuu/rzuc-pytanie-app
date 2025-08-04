@@ -99,16 +99,16 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
   return (
     <ScrollView style={styles.viewWrapper}>
       <View>
-        <MyText align="center" size="l">
+        <MyText align="center" size="xl">
           Dodaj własne pytania
         </MyText>
         <View>
           <MyText align="center">Zadajesz pytania graczowi</MyText>
-          <MyText align="center" color="orange">
+          <MyText align="center" color="purple" size="xl">
             {questionTargetPlayer?.playerName}
           </MyText>
         </View>
-        <MyText align="center" size="s" color="gray">
+        <MyText align="center" size="m" color="gray">
           Im więcej oczek tym pytanie powinno być trudniejsze. Pytania te są
           anonimowe. Pytania mogą być najróżniejsze, od sprawdzenia wiedzy z
           różnych kategorii aż po sferę prywatną. Daj upust swojej wyobraźni!
@@ -148,7 +148,7 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
           </MyText>
         </MyButton>
 
-        <MyText align="center" size="s" color="gray">
+        <MyText align="center" size="m" color="yellow">
           {player?.isReady
             ? 'Jesteś gotowy, czekaj na rozpoczęcie gry'
             : 'Aktualnie jesteś niegotowy'}

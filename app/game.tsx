@@ -138,10 +138,18 @@ const Game = () => {
 
     const handleGameReset = (newLobbyState: Lobby) => {
       console.log('Gra została zresetowana')
-      setLobby(newLobbyState)
 
-      console.log('GRA ZRESETOWANA! 🥳🥳🥳')
-      console.log(players)
+      const playersWithoutPoints: Player[] = newLobbyState.players.map((p) => ({
+        ...p,
+        points: 0,
+        questions: [],
+        isReady: false,
+        questionsTargetPlayerId: undefined,
+      }))
+
+      setLobby({ ...newLobbyState, players: playersWithoutPoints })
+      setPlayers(playersWithoutPoints)
+
       router.push({ pathname: '/lobby', params: { accessCode } })
     }
 
@@ -366,7 +374,7 @@ const styles = StyleSheet.create({
   viewContent: {
     marginVertical: 12,
     paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingVertical: 54,
   },
 
   gameHeader: {

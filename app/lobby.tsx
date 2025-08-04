@@ -8,6 +8,7 @@ import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
 import { router, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -19,7 +20,6 @@ import {
 export default function Lobby() {
   const navigation = useNavigation()
 
-  // Wykorzystanie danych z lobbyStore
   const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
     (state) => state,
   )
@@ -33,14 +33,15 @@ export default function Lobby() {
     setHostId,
   } = useLobbyStore()
 
-  // Czy gracz jest hostem rozgrywki
   const playerSocketId = socket.id
   const isHost = playerSocketId === hostId
 
-  // Zapisywanie danych z API
   const [availableCategories, setAvailableCategories] = useState<
     Category[] | null
   >(null)
+  const [canStartGame, setCanStartGame] = useState(false)
+  const [waitingForGameStart, setWaitingForGameStart] = useState(false)
+  const [isGameStarting, setIsGameStarting] = useState(false)
 
   useEffect(() => {
     const listener = navigation.addListener('beforeRemove', (e) => {
@@ -53,7 +54,6 @@ export default function Lobby() {
     }
   })
 
-  // Nasłuchiwanie socketów
   useEffect(() => {
     const handleLobbyCreated = (lobbyData: LobbyType) => {
       setLobby(lobbyData)
@@ -68,13 +68,15 @@ export default function Lobby() {
     }
 
     const handleGameStarted = (lobbyData: LobbyType) => {
+      setIsGameStarting(true)
       setLobby(lobbyData)
 
-      // Przekierowanie do ekranu gry
-      router.replace({
-        pathname: '/game',
-        params: { accessCode: lobbyData.accessCode },
-      })
+      setTimeout(() => {
+        router.replace({
+          pathname: '/game',
+          params: { accessCode: lobbyData.accessCode },
+        })
+      }, 3000)
     }
 
     const handleHostUpdated = (hostId: string) => {
@@ -101,11 +103,9 @@ export default function Lobby() {
     }
   }, [setPlayers, setRounds, setCategoryList, setHostId])
 
-  // Zapytania do API
   useEffect(() => {
     const fetchCategories = async () => {
       const categories = await getCategories()
-
       setAvailableCategories(categories)
       console.log(categories)
     }
@@ -113,7 +113,14 @@ export default function Lobby() {
     fetchCategories()
   }, [])
 
-  // Aktualizuj wartość ilości rund w rozgrywce
+  useEffect(() => {
+    if (players.length >= 2 && categories.length >= 1) {
+      setCanStartGame(true)
+    } else {
+      setCanStartGame(false)
+    }
+  }, [players, categories])
+
   const handleSetRounds = (action: 'add' | 'subtract') => {
     if (!isHost) return
 
@@ -130,13 +137,11 @@ export default function Lobby() {
     socketEditLobby(accessCode, 'changeRoundsNumber', roundsNumber)
   }
 
-  // Aktualizuj wybrane kategorie pytań
   const handleSelectCategory = (id: number) => {
     if (!isHost) return
     toggleCategory(accessCode, id)
   }
 
-  // Opuść grę
   const handleExitGame = () => {
     router.replace({
       pathname: '/menu',
@@ -146,10 +151,9 @@ export default function Lobby() {
     socket.connect()
   }
 
-  // Rozpocznij grę
   const handleStartGame = () => {
-    if (!isHost) return
-    // Sprawdź, czy wybrano kategorie pytań i czy jest więcej niż 1 gracz!!!
+    if (!isHost || waitingForGameStart) return
+
     if (categories.length < 1) {
       Alert.alert('Wybierz przynajmniej jedną kategorię pytań')
       return
@@ -158,16 +162,30 @@ export default function Lobby() {
       return
     }
 
+    setWaitingForGameStart(true)
+
     socket.emit(
       'startGame',
       { accessCode, categories, rounds },
       (response: { success: boolean }) => {
-        if (response.success) {
-          console.log('Gra rozpoczęta pomyślnie')
-        } else {
-          console.log('Błąd podczas rozpoczynania gry')
+        setWaitingForGameStart(false)
+
+        if (!response.success) {
+          Alert.alert('Nie udało się rozpocząć gry')
         }
       },
+    )
+  }
+
+  // EKRAN ŁADOWANIA PRZED WEJŚCIEM DO GRY
+  if (isGameStarting) {
+    return (
+      <View style={styles.loadingWrapper}>
+        <MyText align="center" color="white">
+          Zaczynamy!
+        </MyText>
+        <ActivityIndicator size="large" color="#EDCC71" />
+      </View>
     )
   }
 
@@ -179,39 +197,12 @@ export default function Lobby() {
           <AccessCodeView accessCode={accessCode} />
         </View>
 
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingVertical: 24,
-          }}
-        >
+        <View style={styles.roundsControl}>
           <MyText>Ilość rund</MyText>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 0,
-              marginLeft: 24,
-              borderWidth: 2,
-              borderColor: '#f7cd6c',
-              boxShadow: '2px 4px 5px rgba(0, 0, 0, 0.5)',
-              borderRadius: 12,
-              minWidth: 175,
-              opacity: isHost ? 1 : 0.5,
-            }}
-          >
+          <View style={[styles.roundsBox, { opacity: isHost ? 1 : 0.5 }]}>
             <Pressable
               onPress={() => handleSetRounds('subtract')}
-              style={{
-                width: 64,
-                backgroundColor: '#FDD988',
-                borderTopLeftRadius: 8,
-                borderBottomLeftRadius: 8,
-              }}
+              style={styles.roundButton}
             >
               <MyText align="center">-</MyText>
             </Pressable>
@@ -220,12 +211,7 @@ export default function Lobby() {
 
             <Pressable
               onPress={() => handleSetRounds('add')}
-              style={{
-                width: 64,
-                backgroundColor: '#FDD988',
-                borderTopRightRadius: 8,
-                borderBottomRightRadius: 8,
-              }}
+              style={styles.roundButton}
             >
               <MyText align="center">+</MyText>
             </Pressable>
@@ -276,8 +262,13 @@ export default function Lobby() {
 
         <View style={styles.controlButtonsContainer}>
           {isHost ? (
-            <MyButton onPress={handleStartGame}>
-              <MyText align="center">Zaczynamy!</MyText>
+            <MyButton
+              onPress={handleStartGame}
+              disabled={!canStartGame || waitingForGameStart}
+            >
+              <MyText align="center">
+                {waitingForGameStart ? 'Czekaj...' : 'Zaczynamy!'}
+              </MyText>
             </MyButton>
           ) : (
             <MyText align="center">Czekaj na rozpoczęcie gry</MyText>
@@ -295,20 +286,36 @@ const styles = StyleSheet.create({
   viewWrapper: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingVertical: 36,
+    paddingVertical: 54,
   },
-
-  viewContent: {
-    marginVertical: 12,
-  },
-
   accessInfoWrapper: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
+  roundsControl: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 24,
+  },
+  roundsBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 24,
+    borderWidth: 2,
+    borderColor: '#f7cd6c',
+    borderRadius: 12,
+    minWidth: 175,
+  },
+  roundButton: {
+    width: 64,
+    backgroundColor: '#FDD988',
+    borderRadius: 8,
+  },
   categoriesWrapper: {
     maxHeight: 200,
     marginVertical: 6,
@@ -319,19 +326,15 @@ const styles = StyleSheet.create({
     borderColor: '#FDD988',
     borderRadius: 24,
   },
-
   categoryElement: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-
     marginVertical: 6,
   },
-
   playersWrapper: {
     maxHeight: 220,
   },
-
   playerElement: {
     flex: 1,
     flexDirection: 'row',
@@ -344,8 +347,13 @@ const styles = StyleSheet.create({
     borderColor: '#FDD988',
     borderRadius: 24,
   },
-
   controlButtonsContainer: {
     paddingVertical: 24,
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
   },
 })

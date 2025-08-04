@@ -6,7 +6,7 @@ type MyTextProps = TextProps & {
   align?: 'left' | 'center' | 'right'
   bold?: boolean
   size?: 's' | 'm' | 'l' | 'xl'
-  color?: 'white' | 'gray' | 'orange' | 'purple' | 'yellow'
+  color?: 'white' | 'gray' | 'orange' | 'purple' | 'yellow' | 'green' | 'red'
 }
 
 const MyText: React.FC<MyTextProps> = ({
@@ -35,6 +35,10 @@ const MyText: React.FC<MyTextProps> = ({
               ? '#A017F4'
               : color === 'yellow'
               ? '#FDD988'
+              : color === 'green'
+              ? '#00B74A'
+              : color === 'red'
+              ? '#FF3D00'
               : '#D9DBDE',
         },
       ]}
@@ -49,6 +53,8 @@ export default MyText
 
 const styles = StyleSheet.create({
   text: {
+    flex: 1,
+    flexWrap: 'wrap',
     color: '#fff',
     fontSize: 16,
     fontFamily: 'MuseoModerno',

@@ -69,20 +69,25 @@ const PlayerShowAnswerView: React.FC<PlayerShowAnswerViewProps> = ({
   return (
     <View style={styles.container}>
       {shouldShowResult && (
-        <View style={styles.answerContainer}>
-          {isCorrectAnswer ? (
-            <MyText align="center" size="m">
-              Świetnie! Poprawna odpowiedź to
+        <>
+          <View style={styles.answerContainer}>
+            {isCorrectAnswer ? (
+              <MyText align="center" size="xl">
+                Świetnie! Poprawna odpowiedź to
+              </MyText>
+            ) : (
+              <MyText align="center" size="xl">
+                Ale szkoda! Poprawna odpowiedź to
+              </MyText>
+            )}
+          </View>
+
+          <View style={styles.correctAnswer}>
+            <MyText align="center" size="xl" color="yellow">
+              {questionAnswer}
             </MyText>
-          ) : (
-            <MyText align="center" size="m">
-              Ale szkoda! Poprawna odpowiedź to
-            </MyText>
-          )}
-          <MyText align="center" size="xl" color="orange">
-            {questionAnswer}
-          </MyText>
-        </View>
+          </View>
+        </>
       )}
 
       {isCurrentPlayer && shouldShowResult && (
@@ -107,8 +112,12 @@ const styles = StyleSheet.create({
   },
 
   answerContainer: {
-    flex: 1,
+    flex: 0.65,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  correctAnswer: {
+    flex: 0.35,
   },
 })

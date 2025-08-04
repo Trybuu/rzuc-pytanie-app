@@ -2,6 +2,10 @@
   "expo": {
     "name": "rzuc-pytanie-app",
     "slug": "rzuc-pytanie-app",
+    "extra": {
+      "API_IP": "192.168.1.9",
+      "API_PORT": "3000"
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

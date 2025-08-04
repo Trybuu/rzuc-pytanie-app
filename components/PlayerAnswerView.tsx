@@ -1,7 +1,34 @@
 import { Question } from '@/store/lobbyStore'
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { useEffect } from 'react'
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native'
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated'
 import MyButton from './Button'
 import MyText from './MyText'
+
+const dieImages = [
+  require('@/assets/images/regular_dies/die1.png'),
+  require('@/assets/images/regular_dies/die2.png'),
+  require('@/assets/images/regular_dies/die3.png'),
+  require('@/assets/images/regular_dies/die4.png'),
+  require('@/assets/images/regular_dies/die5.png'),
+  require('@/assets/images/regular_dies/die6.png'),
+]
+
+const AnimatedView = Animated.createAnimatedComponent(View)
 
 type PlayerAnswerViewProps = {
   lastDiceRoll: number | undefined
@@ -13,15 +40,6 @@ type PlayerAnswerViewProps = {
   handleShowAnswer: () => void
   handleSetMarkedAnswer: (answer: string) => void
 }
-
-const dieImages = [
-  require('@/assets/images/regular_dies/die1.png'),
-  require('@/assets/images/regular_dies/die2.png'),
-  require('@/assets/images/regular_dies/die3.png'),
-  require('@/assets/images/regular_dies/die4.png'),
-  require('@/assets/images/regular_dies/die5.png'),
-  require('@/assets/images/regular_dies/die6.png'),
-]
 
 const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   lastDiceRoll,
@@ -35,8 +53,53 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
 }) => {
   if (!lastDiceRoll || !drawnQuestion) return <View style={styles.container} />
 
+  // Animacje
+  const diceOpacity = useSharedValue(0)
+  const diceTranslateY = useSharedValue(20)
+
+  const answersOpacity = useSharedValue(0)
+  const answersTranslateY = useSharedValue(20)
+
+  useEffect(() => {
+    // Animacja wyjazdu dice + pytania
+    diceOpacity.value = withTiming(1, {
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+    })
+    diceTranslateY.value = withTiming(0, {
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+    })
+
+    // Po animacji dice, animujemy odpowiedzi z opóźnieniem 600ms
+    answersOpacity.value = withDelay(
+      600,
+      withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) }),
+    )
+    answersTranslateY.value = withDelay(
+      600,
+      withTiming(0, { duration: 500, easing: Easing.out(Easing.ease) }),
+    )
+  }, [lastDiceRoll, drawnQuestion])
+
+  const diceStyle = useAnimatedStyle(() => ({
+    opacity: diceOpacity.value,
+    transform: [{ translateY: diceTranslateY.value }],
+  }))
+
+  const answersStyle = useAnimatedStyle(() => ({
+    opacity: answersOpacity.value,
+    transform: [{ translateY: answersTranslateY.value }],
+  }))
+
+  const onCheckAnswer = () => {
+    if (questionAnswer && markedAnswer !== '') {
+      handleShowAnswer()
+    }
+  }
+
   const renderDiceAndQuestion = () => (
-    <View style={styles.questionWrapper}>
+    <AnimatedView style={[styles.questionWrapper, diceStyle]}>
       <Image
         source={dieImages[lastDiceRoll - 1]}
         style={{ width: 32, height: 32, marginBottom: 12 }}
@@ -44,11 +107,11 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
       <MyText align="center" size="m">
         {drawnQuestion.question}
       </MyText>
-    </View>
+    </AnimatedView>
   )
 
   const renderAnswers = () => (
-    <View style={styles.answers}>
+    <AnimatedView style={[styles.answers, answersStyle]}>
       {drawnQuestion.answers.map((answer) => (
         <Pressable
           key={answer}
@@ -64,14 +127,14 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
           </MyText>
         </Pressable>
       ))}
-    </View>
+    </AnimatedView>
   )
 
   const renderActionButtons = () => {
     if (!isCurrentPlayer) return null
 
     return questionAnswer ? (
-      <MyButton onPress={handleShowAnswer}>
+      <MyButton onPress={onCheckAnswer}>
         <MyText align="center">Sprawdź odpowiedź</MyText>
       </MyButton>
     ) : (
@@ -82,23 +145,41 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.content}>
-        {renderDiceAndQuestion()}
-        {questionAnswer && renderAnswers()}
-      </ScrollView>
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          style={styles.flex}
+        >
+          {renderDiceAndQuestion()}
+          {questionAnswer && renderAnswers()}
+        </ScrollView>
 
-      <View style={styles.actionButtonsContainer}>{renderActionButtons()}</View>
-    </View>
+        <View style={styles.actionButtonsContainer}>
+          {renderActionButtons()}
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   )
 }
 
 export default PlayerAnswerView
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+
   container: {
     flexGrow: 1,
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
 
   content: {
@@ -122,7 +203,8 @@ const styles = StyleSheet.create({
 
   answerButton: {
     width: '100%',
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
     marginVertical: 6,
     borderColor: 'rgba(50,50,50,0.2)',
     borderBottomWidth: 1,
@@ -130,6 +212,6 @@ const styles = StyleSheet.create({
   },
 
   actionButtonsContainer: {
-    paddingVertical: 12,
+    paddingVertical: 6,
   },
 })

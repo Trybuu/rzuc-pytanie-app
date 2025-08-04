@@ -1,6 +1,8 @@
+import { API_ENDPOINT } from '@/api/apiData'
 import * as ImagePicker from 'expo-image-picker'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Platform,
@@ -16,6 +18,7 @@ type CreatePlayerProps = {
   image: string
   setPlayerName: (name: string) => void
   setImage: (uri: string) => void
+  onImageUploadComplete?: (success: boolean) => void
 }
 
 const CreatePlayer: React.FC<CreatePlayerProps> = ({
@@ -23,12 +26,22 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
   image,
   setPlayerName,
   setImage,
+  onImageUploadComplete,
 }) => {
+  const [isUploading, setIsUploading] = useState<boolean>(false)
+  const inputRef = useRef<TextInput>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const apiUrl = 'http://192.168.1.13:3000/api/v1'
+  // Opcjonalny focus z opóźnieniem, jeśli potrzebujesz
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     inputRef.current?.focus()
+  //   }, 500)
+  //   return () => clearTimeout(timer)
+  // }, [])
 
   const uploadImageToServer = async (localUri: string) => {
+    setIsUploading(true)
     const filename = localUri.split('/').pop()
     const match = /\.(\w+)$/.exec(filename || '')
     const type = match ? `image/${match[1]}` : `image`
@@ -41,7 +54,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     } as any)
 
     try {
-      const res = await fetch(`${apiUrl}/photos/upload`, {
+      const res = await fetch(`${API_ENDPOINT}/photos/upload`, {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -50,9 +63,13 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       })
 
       const data = await res.json()
-      setImage(`${apiUrl}/photos/${data.url.split('/').pop()}`)
+      setImage(`${API_ENDPOINT}/photos/${data.url.split('/').pop()}`)
+      onImageUploadComplete?.(true)
     } catch (err) {
       console.error('Błąd uploadu:', err)
+      onImageUploadComplete?.(false)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -65,6 +82,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
         setImage(uri)
       }
       reader.readAsDataURL(file)
+      onImageUploadComplete?.(true)
     }
   }
 
@@ -73,22 +91,11 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       'Dodaj zdjęcie',
       'Wybierz źródło zdjęcia',
       [
-        {
-          text: 'Zrób zdjęcie',
-          onPress: takePhoto,
-        },
-        {
-          text: 'Wybierz z galerii',
-          onPress: pickFromGallery,
-        },
-        {
-          text: 'Anuluj',
-          style: 'cancel',
-        },
+        { text: 'Zrób zdjęcie', onPress: takePhoto },
+        { text: 'Wybierz z galerii', onPress: pickFromGallery },
+        { text: 'Anuluj', style: 'cancel' },
       ],
-      {
-        cancelable: true,
-      },
+      { cancelable: true },
     )
   }
 
@@ -102,7 +109,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
     })
 
     if (!result.canceled) {
@@ -112,11 +119,11 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
   }
 
   const pickFromGallery = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.5,
     })
 
     if (!result.canceled) {
@@ -132,19 +139,22 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       <View style={styles.imagePickerWrapper}>
         <Pressable onPress={pickImage}>
           <View style={styles.glowWrapper}>
-            <Image
-              source={
-                image !== ''
-                  ? { uri: image }
-                  : require('@/assets/images/graphics/add_photo_sphere.png')
-              }
-              style={styles.image}
-            />
+            {isUploading ? (
+              <ActivityIndicator size="large" color="#fff" />
+            ) : (
+              <Image
+                source={
+                  image !== ''
+                    ? { uri: image }
+                    : require('@/assets/images/graphics/add_photo_sphere.png')
+                }
+                style={styles.image}
+              />
+            )}
           </View>
         </Pressable>
       </View>
 
-      {/* Web-only input */}
       {Platform.OS === 'web' && (
         <input
           type="file"
@@ -159,12 +169,15 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       </MyText>
 
       <TextInput
+        ref={inputRef}
         value={playerName}
         placeholder="Twoje imię"
-        placeholderTextColor={'#FDD988'}
-        onChange={(e) => setPlayerName(e.nativeEvent.text)}
+        placeholderTextColor="#FDD988"
+        onChangeText={setPlayerName}
         style={styles.input}
-      ></TextInput>
+        blurOnSubmit
+        returnKeyType="done"
+      />
     </View>
   )
 }
@@ -185,10 +198,10 @@ const styles = StyleSheet.create({
     width: 260,
     resizeMode: 'cover',
     borderWidth: 2,
-    borderColor: '#FDD988',
+    borderColor: '#EDCC71',
     borderRadius: 130,
     marginVertical: 24,
-    shadowColor: '#FDD988',
+    shadowColor: '#EDCC71',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 20,
@@ -201,10 +214,8 @@ const styles = StyleSheet.create({
     borderRadius: 130,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#9b5de5',
-    opacity: 1,
-    position: 'relative',
-    shadowColor: '#9b5de5',
+    backgroundColor: '#FDD988',
+    shadowColor: '#FDD988',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 100,
@@ -216,7 +227,6 @@ const styles = StyleSheet.create({
     marginVertical: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
-
     borderWidth: 2,
     borderRadius: 100,
     borderColor: '#FDD988',

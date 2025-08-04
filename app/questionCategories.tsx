@@ -29,7 +29,7 @@ export default function QuestionCategories() {
     return (
       <View style={styles.loadingAndErrorContainer}>
         <BackButton />
-        <MyText align="center">Loading...</MyText>
+        <MyText align="center">Wczytywanie...</MyText>
       </View>
     )
   }
@@ -65,7 +65,7 @@ export default function QuestionCategories() {
 const styles = StyleSheet.create({
   viewWrapper: {
     flexGrow: 1,
-    paddingVertical: 48,
+    paddingVertical: 54,
     paddingHorizontal: 24,
   },
 
