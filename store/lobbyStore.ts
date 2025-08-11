@@ -25,6 +25,8 @@ export type Category = {
   name: string
   is_custom: boolean
   created_at: string
+  description: string
+  icon: string
 }
 
 export type GameStatus =
@@ -106,7 +108,7 @@ export const useLobbyStore = create<LobbyState>((set) => ({
   markedAnswer: '',
   gameStarted: false,
   lastDiceRoll: 0,
-  setLobby: (lobby) => set(() => ({ ...lobby })),
+  setLobby: (lobby) => set((state) => ({ ...state, ...lobby })),
   resetLobby: () =>
     set(() => ({
       hostId: '',

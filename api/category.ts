@@ -4,6 +4,8 @@ export type Category = {
   id: number
   name: string
   created_at: string
+  description: string
+  icon: string
 }
 
 export const getCategories = async (): Promise<Category[]> => {

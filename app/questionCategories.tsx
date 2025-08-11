@@ -1,24 +1,23 @@
 import MyText from '@/components/MyText'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
-import { getCategories } from '@/api/category'
+import { Category, getCategories } from '@/api/category'
 import BackButton from '@/components/BackButton'
+import Entypo from '@expo/vector-icons/Entypo'
 import { useQuery } from '@tanstack/react-query'
-
-type CategoryType = {
-  id: number
-  name: string
-  createdAt: string
-}
+import { useState } from 'react'
 
 // 1. Dodać możliwość ponownej próby jeśli wystąpił błąd
 export default function QuestionCategories() {
+  const [categoryDescExpandedId, setCategoryDescExpandedId] = useState<
+    number | null
+  >(0)
   const {
     data: categories,
     isLoading,
     isError,
     error,
-  } = useQuery<CategoryType[]>({
+  } = useQuery<Category[], Error>({
     queryKey: ['categories'],
     queryFn: getCategories,
     staleTime: 1000 * 60 * 5, // 5 minutes cache time
@@ -45,6 +44,15 @@ export default function QuestionCategories() {
     )
   }
 
+  const handleExpandDesc = (index: number) => {
+    setCategoryDescExpandedId((prev) => {
+      if (prev === index) {
+        return null
+      }
+      return index
+    })
+  }
+
   return (
     <ScrollView style={styles.viewWrapper}>
       <BackButton />
@@ -52,9 +60,39 @@ export default function QuestionCategories() {
         {categories &&
           categories.map((category, index) => {
             return (
-              <View key={index} style={styles.categoryContainer}>
-                <MyText>{category.name}</MyText>
-              </View>
+              <Pressable key={index} onPress={() => handleExpandDesc(index)}>
+                <View style={styles.categoryContainer}>
+                  <MyText style={styles.categoryIcon}>{category.icon}</MyText>
+
+                  <View style={styles.categoryContent}>
+                    <MyText flexWrap={true}>{category.name}</MyText>
+
+                    {index === categoryDescExpandedId ? (
+                      <Entypo
+                        name="chevron-with-circle-up"
+                        size={24}
+                        color="#FDD988"
+                      />
+                    ) : (
+                      <Entypo
+                        name="chevron-with-circle-down"
+                        size={24}
+                        color="#FDD988"
+                      />
+                    )}
+                  </View>
+
+                  <View
+                    style={{
+                      marginTop: 12,
+                      display:
+                        categoryDescExpandedId === index ? 'flex' : 'none',
+                    }}
+                  >
+                    <MyText size="m">{category.description}</MyText>
+                  </View>
+                </View>
+              </Pressable>
             )
           })}
       </View>
@@ -74,11 +112,38 @@ const styles = StyleSheet.create({
   },
 
   categoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginBottom: 12,
-    padding: 12,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#FDD988',
     borderRadius: 24,
+    padding: 12,
+  },
+
+  categoryIcon: {
+    borderWidth: 2,
+    borderColor: '#FDD988',
+    borderRadius: 100,
+    padding: 12,
+    marginRight: 12,
+  },
+
+  categoryContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+
+  chevron: {
+    flexShrink: 0,
+  },
+
+  categoryName: {
+    flexDirection: 'row',
+    padding: 12,
   },
 
   loadingAndErrorContainer: {

@@ -2,8 +2,7 @@ import BackButton from '@/components/BackButton'
 import MyText from '@/components/MyText'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
-import Accordion from 'react-native-collapsible/Accordion'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 const SECTIONS = [
   {
@@ -58,7 +57,7 @@ const SECTIONS = [
     ),
   },
   {
-    title: 'Kategorie Pytań: Wiedza publiczna kontra sekrety współgraczy!',
+    title: 'Kategorie Pytań: Wiedza ogólna kontra sekrety współgraczy!',
     content: (
       <>
         <MyText>
@@ -94,41 +93,18 @@ const SECTIONS = [
 ]
 
 export default function HowToPlay() {
-  const [activeSections, setActiveSections] = useState<number[]>([])
+  const [activeSection, setActiveSection] = useState<number | null>(null)
 
-  const renderHeader = (section: any, _: number, isActive: boolean) => (
-    <View style={[styles.accordionHeader]}>
-      {isActive ? (
-        <Entypo
-          name="chevron-with-circle-up"
-          size={24}
-          color={isActive ? '#FDD988' : 'white'}
-          style={{ marginRight: 6 }}
-        />
-      ) : (
-        <Entypo
-          name="chevron-with-circle-down"
-          size={24}
-          color={isActive ? '#FDD988' : 'white'}
-          style={{ marginRight: 6 }}
-        />
-      )}
-      <MyText size="m" color={isActive ? 'yellow' : 'white'}>
-        {section.title}
-      </MyText>
-    </View>
-  )
-
-  const renderContent = (section: any) => (
-    <View style={styles.accordionContent}>{section.content}</View>
-  )
+  const handleExpandSection = (index: number) => {
+    setActiveSection((prev) => (prev === index ? null : index))
+  }
 
   return (
     <ScrollView style={styles.viewWrapper}>
       <BackButton />
 
       <View>
-        <MyText size="xl" color="purple">
+        <MyText size="xl" color="yellow">
           Instrukcje dla Arcymistrzów Imprez i Wiedzy Tajemnej!
         </MyText>
 
@@ -142,15 +118,41 @@ export default function HowToPlay() {
         </MyText>
       </View>
 
-      <View style={styles.accordionContainer}>
-        <Accordion
-          sections={SECTIONS}
-          activeSections={activeSections}
-          renderHeader={renderHeader}
-          renderContent={renderContent}
-          onChange={setActiveSections}
-          underlayColor="transparent"
-        />
+      <View>
+        {SECTIONS.map((section, index) => (
+          <Pressable
+            onPress={() => handleExpandSection(index)}
+            key={index}
+            style={styles.sectionContainer}
+          >
+            <View style={styles.sectionContent}>
+              <MyText flexWrap={true}>{section.title}</MyText>
+              {index === activeSection ? (
+                <Entypo
+                  name="chevron-with-circle-down"
+                  size={24}
+                  color="#FDD988"
+                />
+              ) : (
+                <Entypo
+                  name="chevron-with-circle-up"
+                  size={24}
+                  color="#FDD988"
+                />
+              )}
+            </View>
+
+            <View
+              style={[
+                activeSection === index
+                  ? { display: 'flex', flex: 1 }
+                  : { display: 'none' },
+              ]}
+            >
+              {section.content}
+            </View>
+          </Pressable>
+        ))}
       </View>
 
       <View>
@@ -171,21 +173,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
 
-  accordionContainer: {
-    marginVertical: 24,
+  sectionContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: '#FDD988',
+    borderRadius: 24,
+    padding: 12,
   },
 
-  accordionHeader: {
+  sectionContent: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-  },
-  accordionHeaderActive: {
-    color: '#FDD988',
-  },
-  accordionContent: {
-    paddingVertical: 8,
+    flex: 1,
   },
 })

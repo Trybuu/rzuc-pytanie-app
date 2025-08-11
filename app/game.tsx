@@ -53,10 +53,6 @@ const Game = () => {
 
   const router = useRouter()
 
-  console.log('CURRENT CATEGORY INDEX', currentCategoryIndex)
-  console.log('CURRENT CATEGORY', currentCategory)
-  // const currentQuestions = players?.flatMap((p) => p.questions || []) // Nie używane
-
   const [isAnswerVisible, setAnswerVisible] = useState(false)
 
   useEffect(() => {
@@ -103,7 +99,6 @@ const Game = () => {
     }
 
     const handleMarkedAnswerUpdated = (answer: string) => {
-      console.log('Odpowiedź zaznaczona:', answer)
       setMarkedAnswer(answer)
     }
 
@@ -124,31 +119,15 @@ const Game = () => {
         router.replace({ pathname: '/menu' })
       }
     }
-
-    const handleHostUpdated = (hostId: string) => {
-      setHostId(hostId)
-
-      const newHost = players.find((p) => p.id === hostId)
-      Alert.alert(
-        'Zmieniono gospodarza rozgrywki',
-        'Nowy gospodarz: ' + newHost?.playerName,
-      )
-      console.log('ZMIANA HOSTA!!!: 🥳🥳🥳', hostId)
-    }
-
-    const handleGameReset = (newLobbyState: Lobby) => {
-      console.log('Gra została zresetowana')
-
-      const playersWithoutPoints: Player[] = newLobbyState.players.map((p) => ({
-        ...p,
-        points: 0,
-        questions: [],
-        isReady: false,
-        questionsTargetPlayerId: undefined,
-      }))
-
-      setLobby({ ...newLobbyState, players: playersWithoutPoints })
-      setPlayers(playersWithoutPoints)
+    const handleGameReset = ({
+      lobby,
+      players,
+    }: {
+      lobby: Lobby
+      players: Player[]
+    }) => {
+      setLobby(lobby)
+      setPlayers(players)
 
       router.push({ pathname: '/lobby', params: { accessCode } })
     }
@@ -159,7 +138,6 @@ const Game = () => {
     socket.on('markedAnswerUpdated', handleMarkedAnswerUpdated)
     socket.on('playerPointsUpdated', handleUpdatePlayerPoints)
     socket.on('playerDisconnected', handlePlayerDisconected)
-    socket.on('hostUpdated', handleHostUpdated)
     socket.on('gameReset', handleGameReset)
 
     return () => {
@@ -169,7 +147,6 @@ const Game = () => {
       socket.off('markedAnswerUpdated', handleMarkedAnswerUpdated)
       socket.off('playerPointsUpdated', handleUpdatePlayerPoints)
       socket.off('playerDisconnected', handlePlayerDisconected)
-      socket.off('hostUpdated', handleHostUpdated)
       socket.off('gameReset', handleGameReset)
     }
   }, [
@@ -179,12 +156,35 @@ const Game = () => {
     setMarkedAnswer,
     setPlayerPoints,
     resetLobby,
-    setHostId,
   ])
+
+  const [hostAlertShownFor, setHostAlertShownFor] = useState<string | null>(
+    null,
+  )
+
+  useEffect(() => {
+    const handleHostUpdated = (hostId: string) => {
+      setHostId(hostId)
+      const newHost = players.find((p) => p.id === hostId)
+
+      if (hostAlertShownFor !== hostId) {
+        Alert.alert(
+          'Zmieniono gospodarza rozgrywki',
+          'Nowy gospodarz: ' + newHost?.playerName,
+        )
+        setHostAlertShownFor(hostId)
+      }
+    }
+
+    socket.on('hostUpdated', handleHostUpdated)
+
+    return () => {
+      socket.off('hostUpdated', handleHostUpdated)
+    }
+  }, [players, hostAlertShownFor]) // dodajemy players i hostAlertShownFor
 
   useEffect(() => {
     const current = players.find((p) => p.id === socket.id)
-    console.log('Aktualny gracz:', current)
   }, [players])
 
   const emitGameAction = (newStatus: GameStatus, data?: any) => {
@@ -199,7 +199,6 @@ const Game = () => {
         console.log(`Wysłano żądanie zmiany statusu gry na: ${newStatus}`)
       },
     )
-    console.log('wysłany status na serwer', newStatus)
   }
 
   const handlePlayerTurnReady = () => {
@@ -245,6 +244,8 @@ const Game = () => {
       { accessCode, playerId },
       (response: { success: boolean; message: string }) => {
         if (response.success) {
+          console.log('EMIT judgePlayerAnswer', { accessCode, playerId })
+          console.trace('EMIT trace')
           console.log(response.message)
         } else {
           console.log(response.message)

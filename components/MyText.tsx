@@ -7,6 +7,7 @@ type MyTextProps = TextProps & {
   bold?: boolean
   size?: 's' | 'm' | 'l' | 'xl'
   color?: 'white' | 'gray' | 'orange' | 'purple' | 'yellow' | 'green' | 'red'
+  flexWrap?: boolean
 }
 
 const MyText: React.FC<MyTextProps> = ({
@@ -14,6 +15,7 @@ const MyText: React.FC<MyTextProps> = ({
   bold = false,
   size = 'm',
   color = 'white',
+  flexWrap = false,
   children,
   ...props
 }) => {
@@ -40,6 +42,8 @@ const MyText: React.FC<MyTextProps> = ({
               : color === 'red'
               ? '#FF3D00'
               : '#D9DBDE',
+          flex: flexWrap ? 1 : undefined,
+          flexWrap: flexWrap ? 'wrap' : 'nowrap',
         },
       ]}
       {...props}
@@ -53,8 +57,8 @@ export default MyText
 
 const styles = StyleSheet.create({
   text: {
-    flex: 1,
-    flexWrap: 'wrap',
+    // flex: 1,
+    // flexWrap: 'wrap',
     color: '#fff',
     fontSize: 16,
     fontFamily: 'MuseoModerno',

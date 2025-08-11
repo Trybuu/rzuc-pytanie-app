@@ -2,7 +2,7 @@ import socket from '@/client/socket'
 import { useLobbyStore } from '@/store/lobbyStore'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
-import { Alert, Pressable, StyleSheet, Text } from 'react-native'
+import { Alert, Platform, Pressable, StyleSheet, Text } from 'react-native'
 
 const GameOptions = () => {
   const { resetLobby } = useLobbyStore((state) => state)
@@ -22,10 +22,14 @@ const GameOptions = () => {
   }
 
   const handleButtonClick = () => {
-    Alert.alert('Wyjście z gry', 'Czy na pewno chcesz opuścić grę?', [
-      { text: 'Anuluj', onPress: handleCancel, style: 'cancel' },
-      { text: 'Tak', onPress: handleExitGame },
-    ])
+    if (Platform.OS === 'ios' || Platform.OS === 'android') {
+      Alert.alert('Wyjście z gry', 'Czy na pewno chcesz opuścić grę?', [
+        { text: 'Anuluj', onPress: handleCancel, style: 'cancel' },
+        { text: 'Tak', onPress: handleExitGame },
+      ])
+    } else {
+      handleExitGame()
+    }
   }
 
   return (

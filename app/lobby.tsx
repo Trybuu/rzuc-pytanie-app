@@ -5,6 +5,7 @@ import AccessCodeView from '@/components/AccessCodeView'
 import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
+import Feather from '@expo/vector-icons/Feather'
 import { router, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
@@ -177,6 +178,15 @@ export default function Lobby() {
     )
   }
 
+  const handleShowCategoryDesc = (id: number) => {
+    const category = availableCategories?.find((c) => c.id === id)
+    if (category) {
+      Alert.alert(category.name, category.description)
+    } else {
+      Alert.alert('Kategoria nie znaleziona')
+    }
+  }
+
   // EKRAN ŁADOWANIA PRZED WEJŚCIEM DO GRY
   if (isGameStarting) {
     return (
@@ -222,23 +232,41 @@ export default function Lobby() {
         <ScrollView style={styles.categoriesWrapper}>
           {availableCategories ? (
             availableCategories.map((category) => (
-              <Pressable
+              <View
                 key={category.id}
-                style={[
-                  styles.categoryElement,
-                  categories.includes(category.id) && {
-                    backgroundColor: 'rgba(160, 23, 244, 0.5)',
-                    borderRadius: 12,
-                    padding: 6,
-                  },
-                ]}
-                onPress={(e) => handleSelectCategory(category.id)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
               >
-                <MyText>{category.name}</MyText>
-              </Pressable>
+                <Pressable
+                  style={[
+                    styles.categoryElement,
+                    categories.includes(category.id) && {
+                      backgroundColor: 'rgba(160, 23, 244, 0.5)',
+                      borderRadius: 12,
+                      padding: 6,
+                    },
+                  ]}
+                  onPress={(e) => handleSelectCategory(category.id)}
+                >
+                  <View style={{ marginRight: 6 }}>
+                    <MyText>{category.icon}</MyText>
+                  </View>
+
+                  <View style={{ flex: 1 }}>
+                    <MyText align="left">{category.name}</MyText>
+                  </View>
+                </Pressable>
+                <Pressable onPress={() => handleShowCategoryDesc(category.id)}>
+                  <Feather
+                    name="info"
+                    size={22}
+                    color="rgba(160, 23, 244, 0.5)"
+                    style={{ marginLeft: 6 }}
+                  />
+                </Pressable>
+              </View>
             ))
           ) : (
-            <MyText>Wczytywanie kategorii</MyText>
+            <MyText>Wczytywanie kategorii...</MyText>
           )}
         </ScrollView>
 
@@ -330,6 +358,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 6,
   },
   playersWrapper: {
