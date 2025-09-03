@@ -1,22 +1,11 @@
-import socket from '@/client/socket'
-import { useLobbyStore } from '@/store/lobbyStore'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { router } from 'expo-router'
 import { Alert, Platform, Pressable, StyleSheet, Text } from 'react-native'
 
-const GameOptions = () => {
-  const { resetLobby } = useLobbyStore((state) => state)
+type GameOptionsProps = {
+  handleExitLobby: () => void
+}
 
-  const handleExitGame = () => {
-    socket.disconnect()
-
-    resetLobby()
-    router.push({
-      pathname: '/menu',
-    })
-    socket.connect()
-  }
-
+const GameOptions: React.FC<GameOptionsProps> = ({ handleExitLobby }) => {
   const handleCancel = () => {
     console.log('Anulowano wyjście z gry')
   }
@@ -25,10 +14,10 @@ const GameOptions = () => {
     if (Platform.OS === 'ios' || Platform.OS === 'android') {
       Alert.alert('Wyjście z gry', 'Czy na pewno chcesz opuścić grę?', [
         { text: 'Anuluj', onPress: handleCancel, style: 'cancel' },
-        { text: 'Tak', onPress: handleExitGame },
+        { text: 'Tak', onPress: handleExitLobby },
       ])
     } else {
-      handleExitGame()
+      handleExitLobby()
     }
   }
 

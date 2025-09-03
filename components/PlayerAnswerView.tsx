@@ -51,8 +51,6 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   handleShowAnswer,
   handleSetMarkedAnswer,
 }) => {
-  if (!lastDiceRoll || !drawnQuestion) return <View style={styles.container} />
-
   // Animacje
   const diceOpacity = useSharedValue(0)
   const diceTranslateY = useSharedValue(20)
@@ -61,7 +59,7 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
   const answersTranslateY = useSharedValue(20)
 
   useEffect(() => {
-    // Animacja wyjazdu dice + pytania
+    // Animacja wyjazdu kostka + pytania
     diceOpacity.value = withTiming(1, {
       duration: 500,
       easing: Easing.out(Easing.ease),
@@ -71,7 +69,7 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
       easing: Easing.out(Easing.ease),
     })
 
-    // Po animacji dice, animujemy odpowiedzi z opóźnieniem 600ms
+    // Po animacji kostki, animujemy odpowiedzi z opóźnieniem 600ms
     answersOpacity.value = withDelay(
       600,
       withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) }),
@@ -100,33 +98,41 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
 
   const renderDiceAndQuestion = () => (
     <AnimatedView style={[styles.questionWrapper, diceStyle]}>
-      <Image
-        source={dieImages[lastDiceRoll - 1]}
-        style={{ width: 32, height: 32, marginBottom: 12 }}
-      />
+      {lastDiceRoll ? (
+        <Image
+          source={dieImages[lastDiceRoll - 1]}
+          style={{ width: 32, height: 32, marginBottom: 12 }}
+        />
+      ) : null}
       <MyText align="center" size="m">
-        {drawnQuestion.question}
+        {drawnQuestion ? drawnQuestion.question : 'Brak pytania'}
       </MyText>
     </AnimatedView>
   )
 
   const renderAnswers = () => (
     <AnimatedView style={[styles.answers, answersStyle]}>
-      {drawnQuestion.answers.map((answer) => (
-        <Pressable
-          key={answer}
-          style={styles.answerButton}
-          onPress={() => handleSetMarkedAnswer(answer)}
-        >
-          <MyText
-            size="s"
-            align="center"
-            color={answer === markedAnswer ? 'orange' : 'white'}
+      {drawnQuestion ? (
+        drawnQuestion.answers.map((answer) => (
+          <Pressable
+            key={answer}
+            style={styles.answerButton}
+            onPress={() => handleSetMarkedAnswer(answer)}
           >
-            {answer}
-          </MyText>
-        </Pressable>
-      ))}
+            <MyText
+              size="s"
+              align="center"
+              color={answer === markedAnswer ? 'orange' : 'white'}
+            >
+              {answer}
+            </MyText>
+          </Pressable>
+        ))
+      ) : (
+        <MyText size="s" align="center">
+          Brak odpowiedzi
+        </MyText>
+      )}
     </AnimatedView>
   )
 
@@ -143,6 +149,8 @@ const PlayerAnswerView: React.FC<PlayerAnswerViewProps> = ({
       </MyButton>
     )
   }
+
+  if (!lastDiceRoll || !drawnQuestion) return <View style={styles.container} />
 
   return (
     <KeyboardAvoidingView

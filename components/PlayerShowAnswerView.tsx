@@ -29,14 +29,12 @@ const PlayerShowAnswerView: React.FC<PlayerShowAnswerViewProps> = ({
   const isCorrectAnswer = questionAnswer === markedAnswer
   const shouldShowResult = markedAnswer !== '' && questionAnswer !== null
 
-  // Use effect to trigger judging only once when answer is marked
   useEffect(() => {
     if (isCurrentPlayer && markedAnswer !== '') {
       handleJudgePlayerAnswer(playerId)
     }
   }, [markedAnswer])
 
-  // Sound Effect
   useEffect(() => {
     let sound: Audio.Sound | null = null
 
@@ -93,7 +91,7 @@ const PlayerShowAnswerView: React.FC<PlayerShowAnswerViewProps> = ({
       {isCurrentPlayer && shouldShowResult && (
         <MyButton
           onPress={() => {
-            handleSetMarkedAnswer('') // Reset on next turn
+            handleSetMarkedAnswer('')
             handleNextPlayerTurn()
           }}
         >

@@ -3,7 +3,16 @@ import Logo from '@/components/Logo'
 import MyText from '@/components/MyText'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
+type Route = '/newGame' | '/joinGame' | '/howToPlay' | '/questionCategories'
+
 export default function Menu() {
+  const menuItems: { href: Route; label: string }[] = [
+    { href: '/newGame', label: 'Nowa Gra' },
+    { href: '/joinGame', label: 'Dołącz do gry' },
+    { href: '/howToPlay', label: 'Jak grać' },
+    { href: '/questionCategories', label: 'Kategorie pytań' },
+  ]
+
   return (
     <View style={styles.container}>
       <View style={styles.logoWrapper}>
@@ -11,42 +20,11 @@ export default function Menu() {
       </View>
 
       <ScrollView contentContainerStyle={styles.linksWrapper}>
-        {/* <ImageLink
-          href="/newGame"
-          image={require('@/assets/images/graphics/new_game_button.png')}
-          text="Nowa gra"
-        />
-
-        <ImageLink
-          href="/joinGame"
-          image={require('@/assets/images/graphics/new_game_button.png')}
-          text="Dołącz do gry"
-        />
-
-        <ImageLink
-          href="/howToPlay"
-          image={require('@/assets/images/graphics/new_game_button.png')}
-          text="Jak grać"
-        />
-
-        <ImageLink
-          href="/questionCategories"
-          image={require('@/assets/images/graphics/new_game_button.png')}
-          text="Kategorie pytań"
-        /> */}
-
-        <ButtonLink href={'/newGame'}>
-          <MyText align="center">Nowa Gra</MyText>
-        </ButtonLink>
-        <ButtonLink href={'/joinGame'}>
-          <MyText align="center">Dołącz do gry</MyText>
-        </ButtonLink>
-        <ButtonLink href={'/howToPlay'}>
-          <MyText align="center">Jak grać</MyText>
-        </ButtonLink>
-        <ButtonLink href={'/questionCategories'}>
-          <MyText align="center">Kategorie pytań</MyText>
-        </ButtonLink>
+        {menuItems.map(({ href, label }) => (
+          <ButtonLink href={href} key={href}>
+            <MyText align="center">{label}</MyText>
+          </ButtonLink>
+        ))}
       </ScrollView>
     </View>
   )

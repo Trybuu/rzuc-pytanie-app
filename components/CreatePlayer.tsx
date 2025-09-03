@@ -1,4 +1,3 @@
-import { API_ENDPOINT } from '@/api/apiData'
 import * as ImagePicker from 'expo-image-picker'
 import { useRef, useState } from 'react'
 import {
@@ -32,14 +31,6 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
   const inputRef = useRef<TextInput>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Opcjonalny focus z opóźnieniem, jeśli potrzebujesz
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     inputRef.current?.focus()
-  //   }, 500)
-  //   return () => clearTimeout(timer)
-  // }, [])
-
   const uploadImageToServer = async (localUri: string) => {
     setIsUploading(true)
     const filename = localUri.split('/').pop()
@@ -54,16 +45,24 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     } as any)
 
     try {
-      const res = await fetch(`${API_ENDPOINT}/photos/upload`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      const res = await fetch(
+        `http://${process.env.EXPO_PUBLIC_API_URL}:${process.env.EXPO_PUBLIC_API_PORT}/api/v1/photos/upload`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-api-key': process.env.EXPO_PUBLIC_API_KEY || '',
+          },
+          body: formData,
         },
-        body: formData,
-      })
+      )
 
       const data = await res.json()
-      setImage(`${API_ENDPOINT}/photos/${data.url.split('/').pop()}`)
+      setImage(
+        `http://${process.env.EXPO_PUBLIC_API_URL}:${
+          process.env.EXPO_PUBLIC_API_PORT
+        }/api/v1/photos/${data.url.split('/').pop()}`,
+      )
       onImageUploadComplete?.(true)
     } catch (err) {
       console.error('Błąd uploadu:', err)

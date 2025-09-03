@@ -75,7 +75,6 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
         { accessCode, playerId, questions },
         (response: { success: boolean }) => {
           if (response.success) {
-            // Dopiero teraz ustaw gotowość
             socket.emit(
               'readyChange',
               { accessCode, playerId, isReady },
@@ -91,7 +90,6 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
         },
       )
     } else {
-      // Jeśli cofamy gotowość
       socket.emit('readyChange', { accessCode, playerId, isReady }, () => {})
     }
   }
@@ -144,7 +142,7 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
           onPress={() => handleReadyChange(!player?.isReady)}
         >
           <MyText align="center">
-            {player?.isReady ? 'Gotów' : 'Niegotowy'}
+            {player?.isReady ? 'Gotowy' : 'Niegotowy'}
           </MyText>
         </MyButton>
 

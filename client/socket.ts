@@ -1,8 +1,6 @@
 import { io } from 'socket.io-client'
 
-import { API_PORT, API_URL } from '@/api/apiData'
-
-const socket = io(`http://${API_URL}:${API_PORT}`, {
+const socket = io(`http://192.168.1.10:3000`, {
   transports: ['websocket'],
 })
 

@@ -1,5 +1,3 @@
-import { API_ENDPOINT } from './apiData'
-
 export type Category = {
   id: number
   name: string
@@ -10,7 +8,13 @@ export type Category = {
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await fetch(`${API_ENDPOINT}/category`)
+    const response = await fetch(`http://192.168.1.10:3000/api/v1/category`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.EXPO_PUBLIC_API_KEY || '',
+      },
+    })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null)

@@ -27,18 +27,6 @@ const PlayerRollDiceView: React.FC<PlayerRollDiceViewProps> = ({
     handleRollingDice()
   }
 
-  // const [isGestureDisabled, setIsGestureDisabled] = useState(false)
-  // const onSwipeUp = () => {
-  //   // setIsGestureDisabled(true)
-  //   handleRollingDice()
-  // }
-
-  // const swipeUpGesture = Gesture.Pan().onEnd((e) => {
-  //   if (e.translationY < -50) {
-  //     onSwipeUp()
-  //   }
-  // })
-
   return (
     <View style={styles.container}>
       <DiceToRoll diceFace={lastDiceRoll} />

@@ -2,7 +2,7 @@ import socket from '@/client/socket'
 import { Player } from '@/store/lobbyStore'
 import FastImage from 'expo-fast-image'
 import { useEffect } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -51,9 +51,7 @@ const PlayerTurnView: React.FC<PlayerTurnViewProps> = ({
   if (!currentPlayer) {
     return (
       <View style={styles.container}>
-        <MyText align="center" color="gray">
-          Ładowanie gracza...
-        </MyText>
+        <ActivityIndicator color="#FDD988" />
       </View>
     )
   }

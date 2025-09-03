@@ -2,16 +2,17 @@
   "expo": {
     "name": "rzuc-pytanie-app",
     "slug": "rzuc-pytanie-app",
-    "extra": {
-      "API_IP": "192.168.1.9",
-      "API_PORT": "3000"
-    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rzucpytanieapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "d4406c78-0970-4193-8c0c-2221de785993"
+      }
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -44,6 +45,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "owner": "trybu"
   }
 }

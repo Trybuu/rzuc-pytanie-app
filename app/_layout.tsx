@@ -15,6 +15,11 @@ export default function RootLayout() {
     MuseoModerno: require('../assets/fonts/MuseoModerno-Regular.ttf'),
   })
 
+  const defaultScreenOptions = {
+    headerShown: false,
+    gestureEnabled: false,
+  }
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync()
@@ -52,47 +57,45 @@ export default function RootLayout() {
             <Stack.Screen
               name="index"
               options={{
-                headerShown: false,
+                ...defaultScreenOptions,
                 title: 'Start',
               }}
             />
             <Stack.Screen
               name="menu"
               options={{
-                headerShown: false,
+                ...defaultScreenOptions,
                 title: 'Menu',
               }}
             />
             <Stack.Screen
               name="newGame"
-              options={{ headerShown: false, title: 'Rozpocznij grę' }}
+              options={{ ...defaultScreenOptions, title: 'Rozpocznij grę' }}
             />
             <Stack.Screen
               name="joinGame"
-              options={{ headerShown: false, title: 'Dołącz do gry' }}
+              options={{ ...defaultScreenOptions, title: 'Dołącz do gry' }}
             />
             <Stack.Screen
               name="howToPlay"
-              options={{ headerShown: false, title: 'Jak grać' }}
+              options={{ ...defaultScreenOptions, title: 'Jak grać' }}
             />
             <Stack.Screen
               name="questionCategories"
-              options={{ headerShown: false, title: 'Kategorie pytań' }}
+              options={{ ...defaultScreenOptions, title: 'Kategorie pytań' }}
             />
             <Stack.Screen
               name="lobby"
               options={{
-                headerShown: false,
+                ...defaultScreenOptions,
                 title: 'Gra utworzona',
-                gestureEnabled: false,
               }}
             />
             <Stack.Screen
               name="game"
               options={{
-                headerShown: false,
+                ...defaultScreenOptions,
                 title: 'Gra',
-                gestureEnabled: false,
               }}
             />
           </Stack>

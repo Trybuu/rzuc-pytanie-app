@@ -15,6 +15,16 @@ export default function JoinGame() {
 
   const handleJoinLobby = async () => {
     try {
+      if (playerName.trim().length < 3 || image === null) {
+        Alert.alert('Uzupełnij wszystkie pola')
+        return
+      }
+
+      if (!image) {
+        Alert.alert('Proszę przesłać zdjęcie przed rozpoczęciem gry')
+        return
+      }
+
       const result = await join(accessCode.join(''), playerName, image)
 
       if (!result.success) {
@@ -59,6 +69,4 @@ const styles = StyleSheet.create({
     paddingVertical: 54,
     paddingHorizontal: 24,
   },
-
-  viewContent: {},
 })

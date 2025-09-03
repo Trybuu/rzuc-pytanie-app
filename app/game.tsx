@@ -4,7 +4,6 @@ import CategoryDisplay from '@/components/CategoryDisplay'
 import GameOptions from '@/components/GameOptions'
 import GameOverView from '@/components/GameOverView'
 import GamePrepareQuestions from '@/components/GamePrepareQuestions'
-import MyText from '@/components/MyText'
 import PlayerAnswerView from '@/components/PlayerAnswerView'
 import PlayerRollDiceView from '@/components/PlayerRollDiceView'
 import PlayerShowAnswerView from '@/components/PlayerShowAnswerView'
@@ -14,10 +13,11 @@ import RoundNumberDisplay from '@/components/RoundNumberDisplay'
 import { GameStatus, Lobby, Player, useLobbyStore } from '@/store/lobbyStore'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native'
 
 const Game = () => {
   const [socketId, setSocketId] = useState<string>('')
+
   const {
     hostId,
     accessCode,
@@ -50,31 +50,31 @@ const Game = () => {
   const currentCategory = allCategories?.find(
     (c) => c.id === categories[currentCategoryIndex],
   )
-
   const router = useRouter()
 
-  const [isAnswerVisible, setAnswerVisible] = useState(false)
+  const [hostAlertShownFor, setHostAlertShownFor] = useState<string | null>(
+    null,
+  )
 
   useEffect(() => {
     if (socket.connected && socket.id) {
       setSocketId(socket.id)
     } else {
       socket.on('connect', () => {
-        const socketId = socket.id ?? ''
-        setSocketId(socketId)
+        setSocketId(socket.id ?? '')
       })
     }
   }, [])
 
   useEffect(() => {
     const handlePlayerUpdated = ({
-      id,
+      targetPlayerId,
       targetPlayer,
     }: {
-      id: string
+      targetPlayerId: string
       targetPlayer: Player
     }) => {
-      setPlayer(id, targetPlayer)
+      setPlayer(targetPlayerId, targetPlayer)
     }
 
     socket.on('playerUpdated', handlePlayerUpdated)
@@ -82,26 +82,50 @@ const Game = () => {
     return () => {
       socket.off('playerUpdated', handlePlayerUpdated)
     }
-  }, [])
+  }, [setPlayer])
 
   useEffect(() => {
     const handlePlayersUpdated = (players: Player[]) => {
       setPlayers(players)
     }
+    socket.on('playersUpdated', handlePlayersUpdated)
+    return () => {
+      socket.off('playersUpdated', handlePlayersUpdated)
+    }
+  }, [setPlayers])
 
+  useEffect(() => {
     const handleGameStatusUpdated = (status: GameStatus) => {
       setGameStatus(status)
     }
+    socket.on('gameStatusUpdated', handleGameStatusUpdated)
+    return () => {
+      socket.off('gameStatusUpdated', handleGameStatusUpdated)
+    }
+  }, [setGameStatus])
 
+  useEffect(() => {
     const handleLobbyUpdated = (lobby: Lobby) => {
       setLobby(lobby)
       setPlayers(lobby.players)
     }
+    socket.on('lobbyUpdated', handleLobbyUpdated)
+    return () => {
+      socket.off('lobbyUpdated', handleLobbyUpdated)
+    }
+  }, [setLobby, setPlayers])
 
+  useEffect(() => {
     const handleMarkedAnswerUpdated = (answer: string) => {
       setMarkedAnswer(answer)
     }
+    socket.on('markedAnswerUpdated', handleMarkedAnswerUpdated)
+    return () => {
+      socket.off('markedAnswerUpdated', handleMarkedAnswerUpdated)
+    }
+  }, [setMarkedAnswer])
 
+  useEffect(() => {
     const handleUpdatePlayerPoints = ({
       playerId,
       points,
@@ -111,14 +135,26 @@ const Game = () => {
     }) => {
       setPlayerPoints(playerId, points)
     }
+    socket.on('playerPointsUpdated', handleUpdatePlayerPoints)
+    return () => {
+      socket.off('playerPointsUpdated', handleUpdatePlayerPoints)
+    }
+  }, [setPlayerPoints])
 
-    const handlePlayerDisconected = (playerId: string) => {
+  useEffect(() => {
+    const handlePlayerDisconnected = (playerId: string) => {
       Alert.alert('Gracz rozłączył się', 'Gra zostanie zakończona.')
-
       if (socketId === playerId) {
         router.replace({ pathname: '/menu' })
       }
     }
+    socket.on('playerDisconnected', handlePlayerDisconnected)
+    return () => {
+      socket.off('playerDisconnected', handlePlayerDisconnected)
+    }
+  }, [socketId, router])
+
+  useEffect(() => {
     const handleGameReset = ({
       lobby,
       players,
@@ -128,45 +164,18 @@ const Game = () => {
     }) => {
       setLobby(lobby)
       setPlayers(players)
-
       router.push({ pathname: '/lobby', params: { accessCode } })
     }
-
-    socket.on('playersUpdated', handlePlayersUpdated)
-    socket.on('gameStatusUpdated', handleGameStatusUpdated)
-    socket.on('lobbyUpdated', handleLobbyUpdated)
-    socket.on('markedAnswerUpdated', handleMarkedAnswerUpdated)
-    socket.on('playerPointsUpdated', handleUpdatePlayerPoints)
-    socket.on('playerDisconnected', handlePlayerDisconected)
     socket.on('gameReset', handleGameReset)
-
     return () => {
-      socket.off('playersUpdated', handlePlayersUpdated)
-      socket.off('gameStatusUpdated', handleGameStatusUpdated)
-      socket.off('lobbyUpdated', handleLobbyUpdated)
-      socket.off('markedAnswerUpdated', handleMarkedAnswerUpdated)
-      socket.off('playerPointsUpdated', handleUpdatePlayerPoints)
-      socket.off('playerDisconnected', handlePlayerDisconected)
       socket.off('gameReset', handleGameReset)
     }
-  }, [
-    setPlayers,
-    setGameStatus,
-    setLobby,
-    setMarkedAnswer,
-    setPlayerPoints,
-    resetLobby,
-  ])
-
-  const [hostAlertShownFor, setHostAlertShownFor] = useState<string | null>(
-    null,
-  )
+  }, [setLobby, setPlayers, router, accessCode])
 
   useEffect(() => {
     const handleHostUpdated = (hostId: string) => {
       setHostId(hostId)
       const newHost = players.find((p) => p.id === hostId)
-
       if (hostAlertShownFor !== hostId) {
         Alert.alert(
           'Zmieniono gospodarza rozgrywki',
@@ -175,17 +184,11 @@ const Game = () => {
         setHostAlertShownFor(hostId)
       }
     }
-
     socket.on('hostUpdated', handleHostUpdated)
-
     return () => {
       socket.off('hostUpdated', handleHostUpdated)
     }
-  }, [players, hostAlertShownFor]) // dodajemy players i hostAlertShownFor
-
-  useEffect(() => {
-    const current = players.find((p) => p.id === socket.id)
-  }, [players])
+  }, [players, hostAlertShownFor, setHostId])
 
   const emitGameAction = (newStatus: GameStatus, data?: any) => {
     socket.emit(
@@ -201,41 +204,25 @@ const Game = () => {
     )
   }
 
-  const handlePlayerTurnReady = () => {
-    emitGameAction('playerTurn')
-  }
-
-  const handleRollingDice = () => {
-    emitGameAction('rollTheDice')
-  }
-
-  const handleShowQuestion = () => {
-    emitGameAction('showQuestion')
-  }
-
-  const handleNextPlayerTurn = () => {
-    emitGameAction('nextPlayerTurn')
-  }
-
-  const handleShowAnswer = () => {
-    emitGameAction('showAnswerPhase')
-  }
+  const handlePlayerTurnReady = () => emitGameAction('playerTurn')
+  const handleRollingDice = () => emitGameAction('rollTheDice')
+  const handleShowQuestion = () => emitGameAction('showQuestion')
+  const handleNextPlayerTurn = () => emitGameAction('nextPlayerTurn')
+  const handleShowAnswer = () => emitGameAction('showAnswerPhase')
 
   const handleSetMarkedAnswer = (answer: string) => {
     if (!isCurrentPlayer) return
-    else {
-      socket.emit(
-        'setMarkedAnswer',
-        { accessCode, answer },
-        (response: { success: boolean }) => {
-          if (response.success) {
-            setMarkedAnswer(answer)
-          } else {
-            console.error('Błąd podczas ustawiania zaznaczonej odpowiedzi')
-          }
-        },
-      )
-    }
+    socket.emit(
+      'setMarkedAnswer',
+      { accessCode, answer },
+      (response: { success: boolean }) => {
+        if (response.success) {
+          setMarkedAnswer(answer)
+        } else {
+          console.error('Błąd podczas ustawiania zaznaczonej odpowiedzi')
+        }
+      },
+    )
   }
 
   const handleJudgePlayerAnswer = (playerId: string) => {
@@ -257,9 +244,7 @@ const Game = () => {
   const handleExitLobby = () => {
     socket.disconnect()
     resetLobby()
-    router.push({
-      pathname: '/menu',
-    })
+    router.push({ pathname: '/menu' })
     socket.connect()
   }
 
@@ -288,7 +273,6 @@ const Game = () => {
             handlePlayerTurnReady={handlePlayerTurnReady}
           />
         )
-
       case 'rollingDicePhase':
         return (
           <PlayerRollDiceView
@@ -299,7 +283,6 @@ const Game = () => {
             handleShowQuestion={handleShowQuestion}
           />
         )
-
       case 'questionPhase':
         return (
           <PlayerAnswerView
@@ -313,7 +296,6 @@ const Game = () => {
             handleSetMarkedAnswer={handleSetMarkedAnswer}
           />
         )
-
       case 'showAnswerPhase':
         return (
           <PlayerShowAnswerView
@@ -327,14 +309,12 @@ const Game = () => {
             handleJudgePlayerAnswer={handleJudgePlayerAnswer}
           />
         )
-
       case 'gameOver':
         return (
           <GameOverView hostId={hostId} handlePlayAgain={handlePlayAgain} />
         )
-
       default:
-        return <MyText>Wczytywanie...</MyText>
+        return <ActivityIndicator color="#FDD988" />
     }
   }
 
@@ -350,14 +330,12 @@ const Game = () => {
   return (
     <View style={styles.viewWrapper}>
       <View style={styles.gameOptionsContainer}>
-        <GameOptions />
+        <GameOptions handleExitLobby={handleExitLobby} />
       </View>
-
       <View style={styles.gameHeader}>
         <CategoryDisplay categoryName={currentCategory?.name} />
         <RoundNumberDisplay currentRound={currentRound} roundsTotal={rounds} />
       </View>
-
       <PlayersLeaderboard players={players} playerId={socketId} />
       <View style={styles.gameBody}>{renderGameContent(gameStatus)}</View>
     </View>
@@ -371,24 +349,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
   },
-
   viewContent: {
     marginVertical: 12,
     paddingHorizontal: 24,
     paddingVertical: 54,
   },
-
   gameHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
   gameOptionsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
-
   gameBody: {
     flex: 1,
     paddingVertical: 12,

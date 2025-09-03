@@ -57,8 +57,6 @@ export default MyText
 
 const styles = StyleSheet.create({
   text: {
-    // flex: 1,
-    // flexWrap: 'wrap',
     color: '#fff',
     fontSize: 16,
     fontFamily: 'MuseoModerno',

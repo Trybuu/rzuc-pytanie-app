@@ -19,11 +19,6 @@ import {
 } from 'react-native'
 
 export default function Lobby() {
-  const navigation = useNavigation()
-
-  const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
-    (state) => state,
-  )
   const {
     setLobby,
     resetLobby,
@@ -33,6 +28,10 @@ export default function Lobby() {
     setRounds,
     setHostId,
   } = useLobbyStore()
+  const { accessCode, players, hostId, rounds, categories } = useLobbyStore(
+    (state) => state,
+  )
+  const navigation = useNavigation()
 
   const playerSocketId = socket.id
   const isHost = playerSocketId === hostId
@@ -45,15 +44,13 @@ export default function Lobby() {
   const [isGameStarting, setIsGameStarting] = useState(false)
 
   useEffect(() => {
-    const listener = navigation.addListener('beforeRemove', (e) => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       e.preventDefault()
       navigation.dispatch(e.data.action)
     })
 
-    return () => {
-      listener()
-    }
-  })
+    return unsubscribe
+  }, [navigation])
 
   useEffect(() => {
     const handleLobbyCreated = (lobbyData: LobbyType) => {
@@ -88,7 +85,6 @@ export default function Lobby() {
         'Zmieniono gospodarza rozgrywki',
         'Nowy gospodarz: ' + newHost?.playerName,
       )
-      console.log('ZMIANA HOSTA!!!: 🥳🥳🥳', hostId)
     }
 
     socket.on('lobbyCreated', handleLobbyCreated)
@@ -102,13 +98,12 @@ export default function Lobby() {
       socket.off('gameStarted', handleGameStarted)
       socket.off('hostUpdated', handleHostUpdated)
     }
-  }, [setPlayers, setRounds, setCategoryList, setHostId])
+  }, [setLobby, setPlayers, setRounds, setCategoryList, setHostId])
 
   useEffect(() => {
     const fetchCategories = async () => {
       const categories = await getCategories()
       setAvailableCategories(categories)
-      console.log(categories)
     }
 
     fetchCategories()
@@ -183,11 +178,10 @@ export default function Lobby() {
     if (category) {
       Alert.alert(category.name, category.description)
     } else {
-      Alert.alert('Kategoria nie znaleziona')
+      Alert.alert('Nie znaleziono kategorii pytań', 'Spróbuj ponownie później.')
     }
   }
 
-  // EKRAN ŁADOWANIA PRZED WEJŚCIEM DO GRY
   if (isGameStarting) {
     return (
       <View style={styles.loadingWrapper}>
@@ -266,7 +260,7 @@ export default function Lobby() {
               </View>
             ))
           ) : (
-            <MyText>Wczytywanie kategorii...</MyText>
+            <ActivityIndicator color="#FDD988" />
           )}
         </ScrollView>
 
