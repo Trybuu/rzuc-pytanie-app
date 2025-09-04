@@ -45,23 +45,18 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     } as any)
 
     try {
-      const res = await fetch(
-        `http://${process.env.EXPO_PUBLIC_API_URL}:${process.env.EXPO_PUBLIC_API_PORT}/api/v1/photos/upload`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'x-api-key': process.env.EXPO_PUBLIC_API_KEY || '',
-          },
-          body: formData,
+      const res = await fetch(`${process.env.API_URL}/api/v1/photos/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-api-key': process.env.EXPO_PUBLIC_API_KEY || '',
         },
-      )
+        body: formData,
+      })
 
       const data = await res.json()
       setImage(
-        `http://${process.env.EXPO_PUBLIC_API_URL}:${
-          process.env.EXPO_PUBLIC_API_PORT
-        }/api/v1/photos/${data.url.split('/').pop()}`,
+        `${process.env.API_URL}/api/v1/photos/${data.url.split('/').pop()}`,
       )
       onImageUploadComplete?.(true)
     } catch (err) {

@@ -8,7 +8,7 @@ export type Category = {
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await fetch(`http://192.168.1.10:3000/api/v1/category`, {
+    const response = await fetch(`${process.env.API_URL}/api/v1/category`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
