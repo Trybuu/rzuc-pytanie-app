@@ -1,6 +1,8 @@
 import ButtonLink from '@/components/ButtonLink'
 import Logo from '@/components/Logo'
 import MyText from '@/components/MyText'
+import RateUs from '@/components/RateUs'
+import { useAppReview } from '@/hooks/useAppReview'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 type Route = '/newGame' | '/joinGame' | '/howToPlay' | '/questionCategories'
@@ -12,6 +14,8 @@ export default function Menu() {
     { href: '/howToPlay', label: 'Jak grać' },
     { href: '/questionCategories', label: 'Kategorie pytań' },
   ]
+
+  useAppReview(3)
 
   return (
     <View style={styles.container}>
@@ -26,13 +30,14 @@ export default function Menu() {
           </ButtonLink>
         ))}
       </ScrollView>
+      <RateUs />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 30,
+    paddingTop: 30,
     flex: 1,
   },
   logoWrapper: {
