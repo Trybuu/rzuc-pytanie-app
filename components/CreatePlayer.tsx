@@ -1,4 +1,4 @@
-import { APP_MODE } from '@/api/apiData'
+import { API_URL, APP_MODE } from '@/api/apiData'
 import * as ImagePicker from 'expo-image-picker'
 import { useRef, useState } from 'react'
 import {
@@ -21,8 +21,7 @@ type CreatePlayerProps = {
   onImageUploadComplete?: (success: boolean) => void
 }
 
-const apiUrl =
-  APP_MODE === 'dev' ? process.env.EXPO_PUBLIC_API_URL : process.env.API_URL
+const apiUrl = APP_MODE === 'dev' ? API_URL : process.env.API_URL
 
 const CreatePlayer: React.FC<CreatePlayerProps> = ({
   playerName,

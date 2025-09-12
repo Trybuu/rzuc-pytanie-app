@@ -1,4 +1,4 @@
-import { APP_MODE } from './apiData'
+import { API_URL, APP_MODE } from './apiData'
 
 export type Category = {
   id: number
@@ -8,8 +8,7 @@ export type Category = {
   icon: string
 }
 
-const apiUrl =
-  APP_MODE === 'dev' ? process.env.EXPO_PUBLIC_API_URL : process.env.API_URL
+const apiUrl = APP_MODE === 'dev' ? API_URL : process.env.API_URL
 
 export const getCategories = async (): Promise<Category[]> => {
   try {

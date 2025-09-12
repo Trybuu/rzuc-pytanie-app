@@ -3,6 +3,7 @@ import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
 import { useCreateLobby } from '@/hooks/useCreateLobby'
+import { getPlayerId } from '@/lib/getPlayerId'
 import { useState } from 'react'
 import {
   Alert,
@@ -33,6 +34,7 @@ export default function NewGame() {
         return
       }
 
+      const playerId = await getPlayerId()
       const result = await create(playerName, image)
 
       if (!result.success) {
