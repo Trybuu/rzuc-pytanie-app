@@ -4,8 +4,17 @@ import MyButton from '@/components/Button'
 import CreatePlayer from '@/components/CreatePlayer'
 import MyText from '@/components/MyText'
 import { useJoinLobby } from '@/hooks/useJoinLobby'
+import { getPlayerId } from '@/lib/getPlayerId'
 import { useState } from 'react'
-import { Alert, ScrollView, StyleSheet } from 'react-native'
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from 'react-native'
 
 export default function JoinGame() {
   const { join } = useJoinLobby()
@@ -25,7 +34,19 @@ export default function JoinGame() {
         return
       }
 
-      const result = await join(accessCode.join(''), playerName, image)
+      const playerId = await getPlayerId()
+
+      if (!playerId) {
+        Alert.alert('Nie udało się uzyskać identyfikatora gracza')
+        return
+      }
+
+      const result = await join(
+        accessCode.join(''),
+        playerName,
+        image,
+        playerId,
+      )
 
       if (!result.success) {
         Alert.alert(`Błąd: ${result.message}`)
@@ -36,29 +57,36 @@ export default function JoinGame() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.viewWrapper}>
-      <BackButton />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.viewWrapper}>
+          <BackButton />
 
-      <MyText align="center">
-        Wpisz kod dostępu, aby dołączyć do znajomych!
-      </MyText>
+          <MyText align="center">
+            Wpisz kod dostępu, aby dołączyć do znajomych!
+          </MyText>
 
-      <AccessCodeInput
-        accessCodeArray={accessCode}
-        setAccessCode={setAccessCode}
-      />
+          <AccessCodeInput
+            accessCodeArray={accessCode}
+            setAccessCode={setAccessCode}
+          />
 
-      <CreatePlayer
-        playerName={playerName}
-        image={image}
-        setPlayerName={setPlayerName}
-        setImage={setImage}
-      />
+          <CreatePlayer
+            playerName={playerName}
+            image={image}
+            setPlayerName={setPlayerName}
+            setImage={setImage}
+          />
 
-      <MyButton onPress={handleJoinLobby} bgColor="purple">
-        <MyText align="center">Dołącz</MyText>
-      </MyButton>
-    </ScrollView>
+          <MyButton onPress={handleJoinLobby} bgColor="purple">
+            <MyText align="center">Dołącz</MyText>
+          </MyButton>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   )
 }
 

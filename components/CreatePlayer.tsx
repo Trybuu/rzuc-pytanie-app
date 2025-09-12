@@ -1,4 +1,3 @@
-import { API_URL, APP_MODE } from '@/api/apiData'
 import * as ImagePicker from 'expo-image-picker'
 import { useRef, useState } from 'react'
 import {
@@ -21,7 +20,7 @@ type CreatePlayerProps = {
   onImageUploadComplete?: (success: boolean) => void
 }
 
-const apiUrl = APP_MODE === 'dev' ? API_URL : process.env.API_URL
+// const apiUrl = APP_MODE === 'prod' ? process.env.API_URL : API_URL
 
 const CreatePlayer: React.FC<CreatePlayerProps> = ({
   playerName,
@@ -48,7 +47,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
     } as any)
 
     try {
-      const res = await fetch(`${apiUrl}/api/v1/photos/upload`, {
+      const res = await fetch(`${process.env.API_URL}/api/v1/photos/upload`, {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -58,7 +57,9 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       })
 
       const data = await res.json()
-      setImage(`${apiUrl}/api/v1/photos/${data.url.split('/').pop()}`)
+      setImage(
+        `${process.env.API_URL}/api/v1/photos/${data.url.split('/').pop()}`,
+      )
       onImageUploadComplete?.(true)
     } catch (err) {
       console.error('Błąd uploadu:', err)

@@ -12,9 +12,15 @@ const useJoinLobby = () => {
     accessCode: string,
     playerName: string,
     avatar: string,
+    playerId: string,
   ): Promise<JoinLobbyResult> => {
     try {
-      const lobby = await emitJoinLobby(accessCode, playerName, avatar)
+      const lobby = await emitJoinLobby(
+        accessCode,
+        playerName,
+        avatar,
+        playerId,
+      )
 
       if (!lobby) {
         return { success: false, message: 'Brak odpowiedzi od serwera' }

@@ -35,7 +35,12 @@ export default function NewGame() {
       }
 
       const playerId = await getPlayerId()
-      const result = await create(playerName, image)
+      console.log('playerId: ', playerId)
+      if (!playerId) {
+        Alert.alert('Nie udało się uzyskać identyfikatora gracza')
+        return
+      }
+      const result = await create(playerName, image, playerId)
 
       if (!result.success) {
         Alert.alert(`Błąd: ${result.message}`)

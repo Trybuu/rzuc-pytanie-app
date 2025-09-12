@@ -4,6 +4,7 @@ import socket from './socket'
 const emitCreateLobby = async (
   playerName: string,
   avatar: string,
+  playerId: string,
 ): Promise<Lobby> => {
   return new Promise((resolve, reject) => {
     socket.emit(
@@ -11,6 +12,7 @@ const emitCreateLobby = async (
       {
         playerName: playerName,
         avatar: avatar,
+        playerId: playerId,
       },
       (response: { success: boolean; message: string; lobby: Lobby }) => {
         if (response.success) {
@@ -27,11 +29,12 @@ const emitJoinLobby = async (
   lobbyCode: string,
   playerName: string,
   avatar: string,
+  playerId: string,
 ): Promise<Lobby> => {
   return new Promise((resolve, reject) => {
     socket.emit(
       'joinLobby',
-      { lobbyCode, playerName, avatar },
+      { lobbyCode, playerName, avatar, playerId },
       (response: { success: boolean; message?: string; lobby: Lobby }) => {
         if (response.success) {
           resolve(response.lobby)

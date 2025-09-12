@@ -1,9 +1,8 @@
-import { API_URL, APP_MODE } from '@/api/apiData'
 import { io } from 'socket.io-client'
 
-const apiUrl = APP_MODE === 'dev' ? API_URL : process.env.API_URL
+// const apiUrl = APP_MODE === 'prod' ? process.env.API_URL : API_URL
 
-const socket = io(apiUrl, {
+const socket = io(process.env.API_URL, {
   transports: ['websocket'],
   reconnection: true,
   reconnectionDelay: 2000,

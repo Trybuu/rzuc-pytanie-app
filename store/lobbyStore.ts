@@ -14,6 +14,7 @@ export type Player = {
   id: string
   playerName: string
   avatar: string
+  playerId: string
   questionsTargetPlayerId?: string
   isReady: boolean
   questions: Question[]

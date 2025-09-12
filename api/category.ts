@@ -1,5 +1,3 @@
-import { API_URL, APP_MODE } from './apiData'
-
 export type Category = {
   id: number
   name: string
@@ -8,11 +6,11 @@ export type Category = {
   icon: string
 }
 
-const apiUrl = APP_MODE === 'dev' ? API_URL : process.env.API_URL
+// const apiUrl = APP_MODE === 'prod' ? process.env.API_URL : API_URL
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await fetch(`${apiUrl}/api/v1/category`, {
+    const response = await fetch(`${process.env.API_URL}/api/v1/category`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -6,9 +6,9 @@ const useCreateLobby = () => {
   const setLobby = useLobbyStore((s) => s.setLobby)
   const router = useRouter()
 
-  const create = async (name: string, image: string) => {
+  const create = async (name: string, image: string, playerId: string) => {
     try {
-      const lobby = await emitCreateLobby(name, image)
+      const lobby = await emitCreateLobby(name, image, playerId)
 
       if (!lobby) {
         return { success: false, message: 'Brak odpowiedzi z serwera' }
