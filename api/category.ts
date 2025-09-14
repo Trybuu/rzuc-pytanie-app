@@ -10,13 +10,16 @@ export type Category = {
 
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await fetch(`${process.env.API_URL}/api/v1/category`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.EXPO_PUBLIC_API_KEY || '',
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_URL}/api/v1/category`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.EXPO_PUBLIC_API_KEY ?? '',
+        },
       },
-    })
+    )
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null)

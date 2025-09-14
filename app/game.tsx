@@ -11,11 +11,13 @@ import PlayersLeaderboard from '@/components/PlayersLeaderboard'
 import PlayerTurnView from '@/components/PlayerTurnView'
 import RoundNumberDisplay from '@/components/RoundNumberDisplay'
 import { GameStatus, Lobby, Player, useLobbyStore } from '@/store/lobbyStore'
+import { useKeepAwake } from 'expo-keep-awake'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native'
 
 const Game = () => {
+  useKeepAwake()
   const [socketId, setSocketId] = useState<string>('')
 
   const {

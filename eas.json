@@ -1,15 +1,15 @@
 {
   "build": {
-    "production": {
-      "env": {
-        "API_URL": "https://rzuc-pytanie-backend.onrender.com"
-      },
+    "development": {
+      "environment": "development",
       "ios": {}
     },
-    "development": {
-      "env": {
-        "API_URL": "http://192.168.1.2:3000"
-      },
+    "preview": {
+      "environment": "preview",
+      "ios": {}
+    },
+    "production": {
+      "environment": "production",
       "ios": {}
     }
   }

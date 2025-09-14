@@ -6,6 +6,7 @@ import MyButton from '@/components/Button'
 import MyText from '@/components/MyText'
 import { Lobby as LobbyType, useLobbyStore } from '@/store/lobbyStore'
 import Feather from '@expo/vector-icons/Feather'
+import { useKeepAwake } from 'expo-keep-awake'
 import { router, useNavigation } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
@@ -19,6 +20,7 @@ import {
 } from 'react-native'
 
 export default function Lobby() {
+  useKeepAwake()
   const {
     setLobby,
     resetLobby,
