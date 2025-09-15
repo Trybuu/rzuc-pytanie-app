@@ -20,8 +20,6 @@ type CreatePlayerProps = {
   onImageUploadComplete?: (success: boolean) => void
 }
 
-// const apiUrl = APP_MODE === 'prod' ? process.env.API_URL : API_URL
-
 const CreatePlayer: React.FC<CreatePlayerProps> = ({
   playerName,
   image,

@@ -18,7 +18,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.rzucpytanieapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Potrzebujemy dostępu do aparatu abyś mógł zrobić zdjęcie",
+        "NSPhotoLibraryUsageDescription": "Potrzebujemy dostępu do galerii zdjęć"
       }
     },
     "android": {
@@ -27,7 +29,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.rzucpytanieapp"
+      "package": "com.anonymous.rzucpytanieapp",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
