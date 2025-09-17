@@ -90,7 +90,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
       'Dodaj zdjęcie',
       'Wybierz źródło zdjęcia',
       [
-        { text: 'Zrób zdjęcie', onPress: takePhoto },
+        // { text: 'Zrób zdjęcie', onPress: takePhoto },
         { text: 'Wybierz z galerii', onPress: pickFromGallery },
         { text: 'Anuluj', style: 'cancel' },
       ],

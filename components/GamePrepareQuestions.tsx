@@ -6,9 +6,13 @@ import { useState } from 'react'
 import {
   Alert,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native'
 
@@ -95,67 +99,75 @@ const GamePrepareQuestions: React.FC<GamePrepareQuestionsProps> = ({
   }
 
   return (
-    <ScrollView style={styles.viewWrapper}>
-      <View>
-        <MyText align="center" size="xl">
-          Dodaj własne pytania
-        </MyText>
-        <View>
-          <MyText align="center">Zadajesz pytania graczowi</MyText>
-          <MyText align="center" color="purple" size="xl">
-            {questionTargetPlayer?.playerName}
-          </MyText>
-        </View>
-        <MyText align="center" size="m" color="gray">
-          Im więcej oczek tym pytanie powinno być trudniejsze. Pytania te są
-          anonimowe. Pytania mogą być najróżniejsze, od sprawdzenia wiedzy z
-          różnych kategorii aż po sferę prywatną. Daj upust swojej wyobraźni!
-        </MyText>
-      </View>
-
-      <View>
-        {inputIds.map((input, index) => (
-          <View key={input}>
-            <MyText align="left" size="s" color="gray">
-              Pytanie {index + 1}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView style={styles.viewWrapper}>
+          <View>
+            <MyText align="center" size="xl">
+              Dodaj własne pytania
             </MyText>
-            <View style={styles.inputWrapper}>
-              <Image
-                source={dieImages[index]}
-                style={{ width: 24, height: 24 }}
-              />
-              <TextInput
-                style={styles.textInput}
-                value={inputValues[index]}
-                onChange={(e) =>
-                  handleChangeInputValue(e.nativeEvent.text, index)
-                }
-              ></TextInput>
+            <View>
+              <MyText align="center">Zadajesz pytania graczowi</MyText>
+              <MyText align="center" color="purple" size="xl">
+                {questionTargetPlayer?.playerName}
+              </MyText>
             </View>
+            <MyText align="center" size="m" color="gray">
+              Im więcej oczek tym pytanie powinno być trudniejsze. Pytania te są
+              anonimowe. Pytania mogą być najróżniejsze, od sprawdzenia wiedzy z
+              różnych kategorii aż po sferę prywatną. Daj upust swojej
+              wyobraźni!
+            </MyText>
           </View>
-        ))}
-      </View>
 
-      <View style={styles.readyChangeContainer}>
-        <MyButton
-          bgColor={player?.isReady ? 'green' : 'red'}
-          onPress={() => handleReadyChange(!player?.isReady)}
-        >
-          <MyText align="center">
-            {player?.isReady ? 'Gotowy' : 'Niegotowy'}
-          </MyText>
-        </MyButton>
+          <View>
+            {inputIds.map((input, index) => (
+              <View key={input}>
+                <MyText align="left" size="s" color="gray">
+                  Pytanie {index + 1}
+                </MyText>
+                <View style={styles.inputWrapper}>
+                  <Image
+                    source={dieImages[index]}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <TextInput
+                    style={styles.textInput}
+                    value={inputValues[index]}
+                    onChange={(e) =>
+                      handleChangeInputValue(e.nativeEvent.text, index)
+                    }
+                  ></TextInput>
+                </View>
+              </View>
+            ))}
+          </View>
 
-        <MyText align="center" size="m" color="yellow">
-          {player?.isReady
-            ? 'Jesteś gotowy, czekaj na rozpoczęcie gry'
-            : 'Aktualnie jesteś niegotowy'}
-        </MyText>
-        <MyText align="center" size="s" color="gray">
-          {playersReadyCount} / {players.length} graczy gotowych
-        </MyText>
-      </View>
-    </ScrollView>
+          <View style={styles.readyChangeContainer}>
+            <MyButton
+              bgColor={player?.isReady ? 'green' : 'red'}
+              onPress={() => handleReadyChange(!player?.isReady)}
+            >
+              <MyText align="center">
+                {player?.isReady ? 'Gotowy' : 'Niegotowy'}
+              </MyText>
+            </MyButton>
+
+            <MyText align="center" size="m" color="yellow">
+              {player?.isReady
+                ? 'Jesteś gotowy, czekaj na rozpoczęcie gry'
+                : 'Aktualnie jesteś niegotowy'}
+            </MyText>
+            <MyText align="center" size="s" color="gray">
+              {playersReadyCount} / {players.length} graczy gotowych
+            </MyText>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   )
 }
 
