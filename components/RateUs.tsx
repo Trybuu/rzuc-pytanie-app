@@ -16,10 +16,7 @@ export default function RateUs() {
           style={styles.medal}
         />
       </View>
-
-      <View style={styles.bottomContainer}>
-        <MyText>Podoba Ci się aplikacja? Oceń ją w AppStore!</MyText>
-      </View>
+      <MyText align="left">Oceń aplikację w AppStore!</MyText>
     </Pressable>
   )
 }

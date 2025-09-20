@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "rzuc-pytanie-app",
+    "name": "Rzuć Pytanie",
     "slug": "rzuc-pytanie-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,9 +14,9 @@
       }
     },
     "ios": {
-      "buildNumber": "4",
+      "buildNumber": "6",
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.rzucpytanieapp",
+      "bundleIdentifier": "com.marektrybula.rzucpytanieapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Potrzebujemy dostępu do aparatu abyś mógł zrobić zdjęcie",
