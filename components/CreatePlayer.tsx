@@ -175,6 +175,7 @@ const CreatePlayer: React.FC<CreatePlayerProps> = ({
         onChangeText={setPlayerName}
         style={styles.input}
         blurOnSubmit
+        maxLength={30}
         returnKeyType="done"
       />
     </View>

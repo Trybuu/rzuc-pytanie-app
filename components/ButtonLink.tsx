@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av'
+import { useAudioPlayer } from 'expo-audio'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Link, LinkProps } from 'expo-router'
 import React from 'react'
@@ -14,19 +14,14 @@ const ButtonLink: React.FC<ButtonLinkProps> = ({
   children,
   ...props
 }) => {
+  const player = useAudioPlayer(
+    require('@/assets/sounds/effects/button-click.mp3'),
+  )
+
   const handlePress = async () => {
     if (withSoundEffect) {
       try {
-        const { sound } = await Audio.Sound.createAsync(
-          require('@/assets/sounds/effects/button-click.mp3'),
-        )
-        sound.setVolumeAsync(0.1)
-        await sound.playAsync()
-        sound.setOnPlaybackStatusUpdate((status) => {
-          if (status.isLoaded && status.didJustFinish) {
-            sound.unloadAsync()
-          }
-        })
+        player.play()
       } catch (error) {
         console.warn('Error playing sound:', error)
       }

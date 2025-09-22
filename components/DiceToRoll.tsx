@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av'
+import { useAudioPlayer } from 'expo-audio'
 import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import Animated, {
@@ -30,15 +30,11 @@ const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
   const scale = useSharedValue(1)
   const rotate = useSharedValue(0)
 
-  useEffect(() => {
-    let sound: Audio.Sound | null = null
+  const source = useAudioPlayer(require('@/assets/sounds/dice/dice-roll-1.mp3'))
 
+  useEffect(() => {
     const playDiceSound = async () => {
-      const result = await Audio.Sound.createAsync(
-        require('@/assets/sounds/dice/dice-roll-1.mp3'),
-      )
-      sound = result.sound
-      await sound.playAsync()
+      source.play()
     }
 
     if (diceFace >= 1 && diceFace <= 6) {
@@ -60,12 +56,6 @@ const DiceToRoll: React.FC<DiceToRollProps> = ({ diceFace }) => {
           runOnJS(setAnimationCompleted)(true)
         }),
       )
-    }
-
-    return () => {
-      if (sound) {
-        sound.unloadAsync()
-      }
     }
   }, [diceFace])
 
