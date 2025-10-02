@@ -3,7 +3,7 @@ import MyText from './MyText'
 
 export default function RateUs() {
   const openAppStore = () => {
-    const url = `itms-apps://apps.apple.com/app/6751962039?action=write-review`
+    const url = `itms-apps://apps.apple.com/app/6752801297?action=write-review`
 
     Linking.openURL(url)
   }
